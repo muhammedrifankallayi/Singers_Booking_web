@@ -1,0 +1,297 @@
+.artist {
+    background-color: rgb(173, 173, 173);
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+
+}
+
+.artist {
+    background-image: url("../../../public/images/forget\ images.jpg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+}
+
+.anchor {
+    color: rgb(255, 255, 255);
+    text-decoration: none;
+    text-size-adjust: 50px;
+}
+
+input {
+    border: black;
+}
+
+.usergo {
+    color: white;
+}
+
+.change {
+    background-color: rgba(0, 0, 0, 0.682);
+    border-radius: 8px;
+    padding: 10px;
+    width: 387px !important;
+    height: 250px;
+}
+
+
+.artist_login {
+    font-size: 35px !important;
+    padding-bottom: 30px !important;
+    color: rgb(0, 0, 0);
+}
+
+.artistDetailsLabel {
+    color: black !important;
+    font-size: 16px;
+}
+
+.artistDetailsInput {
+    color: black !important;
+    background-color: rgb(255, 255, 255);
+    font-size: 15px !important;
+}
+
+.artist_details-form {
+    padding: 2% 10% 0% 10% !important;
+    background: rgba(0, 0, 0, 0.674);
+    width: 50%;
+    margin-left: 25%;
+    margin-top: 2%;
+    border-radius: 10px;
+}
+
+.artist_detail_form_anchor {
+    font-size: 16px !important;
+}
+
+.artistDetails_botton {
+    width: 23%;
+    margin-bottom: 5%;
+    font-size: 20px !important;
+    color: white;
+}
+
+/* notification_ artist */
+.notificationH1_div {
+    margin-top: 2%;
+    margin-left: 10%;
+}
+
+.notification_image {
+    width: 60px;
+    height: 60px;
+    border-radius: 50px;
+}
+
+.notification_content_div {
+    display: flex;
+    margin: 2% 0% 20% 2%;
+}
+
+.notification_botton_div {
+    margin-left: 22%;
+    margin-top: 1%;
+}
+
+.notification_para_div {
+    margin-left: 10%;
+    margin-top: 1%
+}
+
+/* .notification_image_div {
+    width: 56px;
+} */
+.booking_infoArtist {
+    padding: 4% 15% 0% 15%;
+
+}
+
+.info_booking_div {
+    background-color: #81E979;
+    padding: 5% 15% 0% 15%;
+    border-radius: 5px;
+}
+
+.booking_view-div {
+    margin-left: 50%;
+}
+
+/* artist bookings information  */
+.bookings_div {
+    padding: 2% 6% 0% 6%;
+    margin-bottom: 31%;
+}
+
+.back {
+    background-color: rgba(0, 0, 0, 0.345) !important;
+}
+
+/* .details_div {} */
+.bg-cover {
+    background-image: url("../../../public/images/R&L.png");
+}
+
+.artist-main_profile_div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f0f0f0;
+}
+
+.personal_information_div {
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    width: 80%;
+    max-width: 900px;
+}
+
+.profile_header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.artist_profile_image_div img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    margin-right: 20px;
+}
+
+.heading_divs {
+    font-size: 1.5rem;
+    color: #333;
+}
+
+/* Define grid styles */
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.detail-label {
+    font-size: 1rem;
+    color: #555;
+    margin: 5px 0;
+    font-weight: bold;
+}
+
+.detail-value {
+    font-size: 1rem;
+    color: #333;
+    margin: 5px 0;
+}
+
+/* Apply responsive design using media queries */
+/* Define general styles */
+.artist-main_profile_div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f0f0f0;
+}
+
+.personal_information_div {
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    width: 80%;
+    max-width: 900px;
+}
+
+.profile_header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.artist_profile_image_div img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    margin-right: 20px;
+}
+
+.name_horizontal {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.heading_divs {
+    font-size: 1.5rem;
+    color: #333;
+    margin: 0;
+}
+
+/* Define grid styles */
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.detail-label {
+    font-size: 1rem;
+    color: #555;
+    margin: 5px 0;
+    font-weight: bold;
+}
+
+.detail-value {
+    font-size: 1rem;
+    color: #333;
+    margin: 5px 0;
+}
+
+.personalDetails_div {
+    margin-left: 10%;
+}
+
+/* Apply responsive design using media queries */
+@media screen and (max-width: 768px) {
+    .personal_information_div {
+        width: 90%;
+    }
+
+    .profile_header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .artist_profile_image_div img {
+        width: 100px;
+        height: 100px;
+        margin: 0;
+        margin-bottom: 10px;
+    }
+
+    .name_horizontal {
+        margin: 0;
+        margin-bottom: 10px;
+    }
+
+    .details-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.artistEditButton {
+    margin-left: 82%;
+}
+
+/* .artist_home_carosel_div {
+    padding: 0% 0% 0% 0%;
+} */

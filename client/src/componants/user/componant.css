@@ -1,0 +1,23 @@
+.footer_main_div {
+
+    border-top: 2px solid #0000005c;
+    background: #1f2937;
+}
+
+.nav_bar_user {
+    position: sticky;
+    top: 0px;
+    z-index: 999;
+}
+
+
+/* eidted */
+.star_input {
+    display: none;
+}
+
+.star {
+    cursor: pointer;
+}
+
+/* .edited */

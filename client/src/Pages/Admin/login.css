@@ -1,0 +1,233 @@
+.admin {
+    background-image: url('../../../public/images/adminbacklogin.jpeg');
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+}
+
+.admin_form {
+    background-color: rgba(0, 0, 0, 0.668);
+    border-radius: 10px;
+    padding: 15px;
+}
+
+.welcome_text {
+    color: rgb(0, 0, 0);
+}
+
+.heading_div {
+    background-color: rgba(255, 255, 255, 0.519);
+    border-radius: 8px;
+}
+
+.form-gap {
+    padding-top: 70px;
+}
+
+.btns:hover {
+    background-color: rgba(0, 0, 255, 0.867);
+    color: black;
+}
+
+.btns {
+    background-color: #6B8E23 !important;
+    color: rgb(255, 255, 255);
+    border: 2px;
+    border-color: #6B8E23;
+}
+
+.panel {
+    border-color: black;
+    box-shadow: 0 0 10px rgba(96, 94, 94, 0.5);
+}
+
+.input-group-addon {
+    border-color: black;
+}
+
+#email {
+    border-color: rgba(0, 0, 0, 0.944);
+}
+
+.container {
+    padding-top: 100px;
+}
+
+.setPasswords {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-image: url("../../../public/images/adminSetpasword.webp")
+}
+
+/* categery */
+.category_input {
+    background: rgba(128, 128, 128, 0.177);
+    border: 1px solid;
+}
+
+.category_div {
+
+    border: 1px solid rgba(0, 0, 0, 0.686);
+    margin-top: 116px !important;
+    margin-right: 134px;
+    margin-left: 353px;
+    box-shadow: 0 0 10px rgba(96, 94, 94, 0.5);
+    width: 35%;
+}
+
+.category_heading {
+    font-size: 30px;
+    margin-left: 16%;
+}
+
+.catogry_list {
+    color: black !important;
+}
+
+.cetegory_botton {
+    width: 90px;
+    font-size: 16px;
+}
+
+.categoryList {
+    color: white;
+    text-decoration: none !important;
+}
+
+/* banner*/
+.bannerImage {
+    width: 90px;
+    height: 60px;
+    border-radius: 7px;
+}
+
+.back_botton {
+    margin-left: 93%;
+}
+
+.Banner_botton {
+    width: 75% !important;
+    font-size: 16px;
+}
+
+.artist_view {
+    margin-left: 1%;
+}
+
+/* .online */
+.about {
+    width: 100%;
+    padding: 78px 0px;
+    background-color: #1919191f;
+
+}
+
+.about img {
+    height: auto;
+    max-width: 100%;
+    border-radius: 5px;
+}
+
+.about-text {
+    width: 100%;
+    max-width: 550px;
+    padding: 0 20px;
+    margin-left: 2%;
+    /* Add some padding for smaller screens */
+    box-sizing: border-box;
+}
+
+.main {
+    width: 95%;
+    max-width: 1130px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    /* Change to column layout for smaller screens */
+    align-items: center;
+}
+
+.about-text h1,
+.about-text h5,
+.about-text p {
+    text-align: center;
+    /* Center align text on smaller screens */
+}
+
+.adminArtistViewButton {
+    background: #f9004d;
+    color: white;
+    text-decoration: none;
+    border: 2px solid transparent;
+    font-weight: bold;
+    padding: 13px 30px;
+    border-radius: 30px;
+    transition: .4s;
+    margin-top: 20px;
+}
+
+.adminArtistViewButton:hover {
+    background: transparent;
+    border: 2px solid #f9004d;
+    cursor: pointer;
+}
+
+.adminArtistView {
+    padding: 0% 2% 0% 0%;
+}
+
+.about-text h1 {
+    color: rgb(0, 0, 0);
+    font-size: 249%;
+}
+
+.about-text h5 {
+    color: rgb(0, 0, 0);
+    font-size: 115%;
+    text-decoration: 2px rgb(0, 0, 0) underline;
+}
+
+.minBudjet {
+    background: black;
+    margin-left: 18%;
+    margin-top: 2%;
+    font-size: 115%;
+    width: 17%;
+    color: white;
+    padding: 1%;
+    border-radius: 13px;
+}
+
+/* Media queries for responsiveness */
+@media screen and (min-width: 1000px) {
+    .main {
+        flex-direction: row;
+        /* Restore row layout for larger screens */
+    }
+
+    .about-text {
+        padding: 0;
+    }
+}
+
+.admin-bookings {
+    padding: 5% 1% 0% 1%;
+}
+
+.drop_bookings {
+    min-width: 200px;
+    background-color: #6B8E23;
+    color: white;
+    border-radius: 5px;
+    height: 40px;
+}
+
+.h1_tototal_users {
+    font-size: 20px;
+}

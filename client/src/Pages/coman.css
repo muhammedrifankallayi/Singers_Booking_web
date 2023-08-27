@@ -1,0 +1,148 @@
+/* .spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.505);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999;
+  height: 100%;
+  width: 100%;
+}
+
+.spinner-border {
+  width: 5rem;
+  height: 5rem;
+  color: white;
+} */
+
+
+.spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  z-index: 999;
+  /* From https://css.glass */
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(4.9px);
+  -webkit-backdrop-filter: blur(4.9px);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.spinner-border {
+  height: 4rem !important;
+  width: 4rem !important;
+}
+
+.custom-carousel-wrapper {
+  padding: 2% 2% 0% 2%;
+}
+
+.banner_image {
+  height: 690px;
+}
+
+.showArtist_div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 2%;
+}
+
+.product-card {
+  width: 100%;
+  max-width: 320px;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.product-image {
+  width: 100%;
+  padding: 8px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.product-details {
+  padding: 16px;
+}
+
+.product-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  margin: 5px 0;
+}
+
+.rating svg {
+  width: 20px;
+  height: 20px;
+  fill: #f1c40f;
+  margin-right: 5px;
+}
+
+.price {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+  margin-top: 10px;
+}
+
+.add-to-cart {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.add-to-cart a {
+  display: inline-block;
+  background-color: #3498db;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+.artist-cart-div {
+  margin-top: 3%;
+}
+
+@media (max-width: 768px) {
+  .product-card {
+    max-width: 100%;
+  }
+}
+
+.searchFilter {
+  padding: 3% 3% 0% 50%;
+  margin-right: 5%;
+}
+
+.search_input {
+  height: 46px;
+  border: 1px solid grey;
+}
+
+.filter_div {
+  margin-left: -16%;
+}
