@@ -478,6 +478,26 @@ label {
     align-items: flex-start;
 }
 
+.ratings_Heading_div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.booking_rate {
+    background-color: rgb(255, 255, 255);
+    border-radius: 5px;
+    max-width: 250px;
+    color: rgb(34, 145, 0);
+    border: 2px solid rgb(34, 145, 0)
+}
+
+.booking_rate:hover {
+    background-color: rgb(34, 145, 0);
+    color: white;
+    border: 2px solid white
+}
+
 /* .main_artist_view_pagess {
     background-image: url('../../../public/images/pexels-haste-leart-v-690597.jpg') !important;
     background-repeat: no-repeat;

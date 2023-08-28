@@ -27,7 +27,6 @@ function Artist() {
             method: 'post',
         }).then((response) => {
             dispatch(hideLoading())
-            toast(response.data.message)
             dispatch(setArtistMore(response.data.data))
             setCategory(response.data.category)
             setValue(response.data.data)
@@ -41,10 +40,6 @@ function Artist() {
     useEffect(() => {
         getData()
     }, [])
-    // edit 1
-
-
-    // edit
 
     function truncate(str, n) {
         return str?.length > n ? str.substr(0, n - 1) + "..." : str;
@@ -56,7 +51,6 @@ function Artist() {
                 method: 'post',
                 data: { artistId: id }
             }).then((response) => {
-                console.log(response.data.success)
                 if (response.data.success) {
                     Navigate('/artist-single-show', { state: response.data })
                 } else {
@@ -82,11 +76,12 @@ function Artist() {
                     dispatch(setSingleArtist(response.data.data))
                     Navigate('/book-artist')
                 } else {
-                    console.log('risvn')
+
                 }
             }).catch((error) => {
-                console.log(error)
                 toast.error('somthing went wrong')
+                localStorage.removeItem('token')
+                Navigate('/login')
             })
         } catch (error) {
             toast('somthing went wrong ')

@@ -27,12 +27,13 @@ artistRoute.post('/get-booking-data', artistAuthmiddileware, artistController.bo
 artistRoute.post('/accept_and_reject', artistAuthmiddileware, artistController.acceptAndReject)
 artistRoute.post('/partner-data', artistAuthmiddileware, artistController.partnerData)
 
-artistRoute.get('/get-all-booking-datas', artistAuthmiddileware, artistController.allBookings)
+artistRoute.post('/get-all-booking-datas', artistAuthmiddileware, artistController.allBookings)
 
 
 artistRoute.patch('/edit-profile', upload.upload.single('image'), artistAuthmiddileware, artistController.editProfile)
 artistRoute.patch('/cancel-booking', artistAuthmiddileware, artistController.cancelBooking)
 
+artistRoute.post('/chat-history', artistAuthmiddileware, artistController.getChatHistory)
 
 artistRoute.post('/create-media', upload.mediaUpload.fields([
     {

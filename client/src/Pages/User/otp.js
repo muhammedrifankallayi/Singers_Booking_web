@@ -29,8 +29,8 @@ function Otp() {
         <>
             <GusetHeader />
             <div className='setPassword' >
-                <div className='authentication_form card p-3' >
-                    <h1 className='title'> Set Password</h1>
+                <div className='authentication_form  p-3' >
+                    <h1 className='title'> Enter Otp</h1>
                     <Form layout='vertical' onFinish={onFinish}>
                         <Form.Item label='Otp' name='otp' >
                             <Input placeholder='Enter otp' />

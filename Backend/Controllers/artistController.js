@@ -12,7 +12,8 @@ const categoryModel = require('../Models/categoryModel')
 const mongoose = require('mongoose');
 const mediaModel = require('../Models/mediaModel')
 const userModel = require('../Models/userModel')
-
+const chatModel = require('../Models/chatModel')
+const ratingModel = require('../Models/ratingModel')
 const cloudinary = require('cloudinary').v2
 cloudinary.config({
     cloud_name: process.env.cloud_name,
@@ -137,7 +138,8 @@ const authorization = async (req, res) => {
             res.status(200).send({
                 success: true, data: {
                     name: artist.firstName,
-                    email: artist.email
+                    email: artist.email,
+                    id: artist._id
                 }
             })
         }
@@ -225,7 +227,6 @@ const artistMoreDetails = async (req, res) => {
             res.status(200).send({ message: 'successfulll', success: true })
         }
     } catch (error) {
-        console.log(error)
         res.status(500).send({ message: 'somthing went wrong', success: false, error })
     }
 }
@@ -233,11 +234,15 @@ const artistMoreDetails = async (req, res) => {
 const profileData = async (req, res) => {
     try {
         const artistMore = await artistMoreDetailsModel.findOne({ artist_id: req.body.artistId })
+        const mediaData = await mediaModel.aggregate([{ $unwind: '$videos' }, {
+            $match: { artistId: req.body.artistId }
+        }])
+        const reviewData = await ratingModel.findOne({ artist_id: req.body.artistId })
         const personal = await artistModel.findById(req.body.artistId)
         if (!artistMore) {
-            return res.status(200).send({ message: 'No datas', success: false })
+            return res.status(200).send({ message: 'No datas', success: false, personal: personal })
         }
-        res.status(200).send({ message: 'artist datas get', success: true, data: artistMore, personal: personal })
+        res.status(200).send({ message: 'artist datas get', success: true, data: artistMore, personal: personal, mediaData: mediaData, reviewData: reviewData })
     } catch (error) {
         res.status(500).send({ message: 'somthing went wrong', success: false })
     }
@@ -460,7 +465,7 @@ const acceptAndReject = async (req, res) => {
 
 const allBookings = async (req, res) => {
     try {
-        const bookingData = await bookingModel.aggregate([{ $unwind: "$orders" }])
+        const bookingData = await bookingModel.aggregate([{ $unwind: "$orders" }, { $match: { artist_id: req.body.artistId } }])
         // const acceptedBookings = bookingData.orders.filter(order => order.status === 'Booked')
         if (!bookingData) {
             return res.status(200).send({ message: 'No bookings', success: false })
@@ -564,6 +569,21 @@ const partnerData = async (req, res) => {
     }
 }
 
+// chat histry
+
+const getChatHistory = async (req, res) => {
+    try {
+        const chatData = await chatModel.aggregate([{ $unwind: '$history' }, { $match: { room_id: req.body.id } }])
+        if (!chatData) {
+            return res.status(200).send({ message: 'No chat history', success: false })
+        }
+        res.status(200).send({ message: 'success full', success: true, chatData: chatData, userId: req.body.artistId })
+    } catch (error) {
+        res.status(500).send({ messasge: 'somthing went wrong', success: false })
+    }
+
+}
+
 
 module.exports = {
     signUp,
@@ -582,5 +602,6 @@ module.exports = {
     allBookings,
     cancelBooking,
     createMedia,
-    partnerData
+    partnerData,
+    getChatHistory
 }

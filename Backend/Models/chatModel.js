@@ -9,9 +9,8 @@ const chatSchema = new mongoose.Schema({
             userName: {
                 type: String
             },
-            user_id: {
+            sender_id: {
                 type: String,
-                ref: 'users',
                 required: true
             },
             chat: {
@@ -27,3 +26,6 @@ const chatSchema = new mongoose.Schema({
         timestamps: true,
     }
 );
+
+const chatModel = mongoose.model('chatHistory', chatSchema)
+module.exports = chatModel

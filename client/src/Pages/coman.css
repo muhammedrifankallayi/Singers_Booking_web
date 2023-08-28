@@ -146,3 +146,22 @@
 .filter_div {
   margin-left: -16%;
 }
+
+.artist_home_carosel_div {
+  padding: 3% 3% 3% 3%;
+}
+
+.gust_main_div {
+  background-image: url('../../public/images/pexels-tima-miroshnichenko-6671607.jpg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+.naivgation_bottons {
+  background-color: rgba(255, 254, 254, 0.725);
+}
+
+.naivgation_bottons:hover {
+  background-color: rgba(0, 0, 0, 0.711);
+}

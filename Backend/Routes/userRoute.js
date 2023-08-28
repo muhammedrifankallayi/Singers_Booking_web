@@ -45,6 +45,6 @@ userRoute.patch('/verify-full-payment', authMiddileware, userController.verifyFu
 userRoute.post('/all-media', authMiddileware, userController.allMedia)
 userRoute.post('/full-payment-booking', authMiddileware, userController.fullPayment)
 userRoute.post('/review', authMiddileware, userController.writeReview)
-
+userRoute.post('/chat-history', authMiddileware, userController.getChatHistory)
 
 module.exports = userRoute

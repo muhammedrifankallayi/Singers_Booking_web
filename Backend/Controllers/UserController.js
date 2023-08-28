@@ -14,7 +14,7 @@ const Razorpay = require('razorpay')
 const mongoose = require('mongoose');
 const mediaModel = require('../Models/mediaModel');
 const ratingModel = require('../Models/ratingModel')
-
+const chatModel = require('../Models/chatModel')
 
 var instance = new Razorpay({
     key_id: process.env.razorPay_Key_id,
@@ -211,7 +211,8 @@ const authorization = async (req, res) => {
                 success: true, data: {
                     name: user.first_name,
                     email: user.email,
-                    profile: user.profile
+                    profile: user.profile,
+                    id: user._id
                 }
             })
         }
@@ -958,6 +959,67 @@ const partnerProfileData = async (req, res) => {
     }
 }
 
+const chatHistory = async (room, text, sender) => {
+    try {
+        console.log('room', room)
+        console.log('sender', sender)
+        console.log('text', text)
+        const userData = await userModel.findById(sender)
+        if (userData) {
+            var Name = userData.first_name + ' ' + userData.last_name
+        } else {
+            const artistData = await artistModel.findById(sender)
+            Name = artistData.firstName + ' ' + artistData.lastName
+        }
+        const roomExist = await chatModel.findOne({ room_id: room })
+        if (roomExist) {
+            await chatModel.updateOne({
+                room_id: room
+            },
+                {
+                    $push: {
+                        history: {
+                            userName: Name,
+                            sender_id: sender,
+                            chat: text,
+                            time: new Date()
+                        }
+                    }
+                })
+        } else {
+            const chatHistory = new chatModel({
+                room_id: room,
+                history: [
+                    {
+                        userName: Name,
+                        sender_id: sender,
+                        chat: text,
+                        time: new Date()
+                    }
+                ]
+            })
+            await chatHistory.save()
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+// chat history
+
+const getChatHistory = async (req, res) => {
+    try {
+        const chatData = await chatModel.aggregate([{ $unwind: '$history' }, { $match: { room_id: req.body.id } }])
+        if (!chatData) {
+            return res.status(200).send({ message: 'No chat history', success: false })
+        }
+        res.status(200).send({ message: 'success full', success: true, chatData: chatData, userId: req.body.userId })
+    } catch (error) {
+        res.status(500).send({ messasge: 'somthing went wrong', success: false })
+    }
+
+}
+
 module.exports = {
     signUp,
     login,
@@ -987,7 +1049,9 @@ module.exports = {
     verifyFullPayment,
     reviewNotification,
     writeReview,
-    partnerProfileData
+    partnerProfileData,
+    chatHistory,
+    getChatHistory
 };
 
 

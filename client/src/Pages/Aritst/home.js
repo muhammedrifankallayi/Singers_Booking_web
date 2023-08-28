@@ -35,13 +35,14 @@ function ArtistHome() {
                     infiniteLoop={true}
                     showThumbs={false}
                     showStatus={false}
+                    className='custom-responsive-carousel'
                 >
                     {banner.map((element) => {
 
                         return (
-                            < div className='bannershow_div'>
+                            < div className='custom-banner-wrapper'>
                                 <>
-                                    < img src={element.image} alt="Motorbike Smoke" className='banner_image' />
+                                    < img src={element.image} alt="Motorbike Smoke" className='custom-banner-image' />
                                     <div className="legend">
                                         <h5>{element.title}</h5>
                                         <p>{element.discription}</p>

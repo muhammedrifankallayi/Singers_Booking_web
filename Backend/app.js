@@ -69,6 +69,7 @@ app.use(cors());
 app.use(bodyParser.json({ limit: '1000mb' }));
 app.use(bodyParser.urlencoded({ limit: '1000mb', extended: true }));
 app.use('/public', express.static(path.join(__dirname, 'public')))
+const userController = require('./Controllers/UserController')
 
 const userRoute = require('./Routes/userRoute');
 const artistRoute = require('./Routes/artistRoute');
@@ -92,9 +93,10 @@ io.on('connection', (socket) => {
         socket.join(room);
     });
 
-    socket.on('message', (data) => {
+    socket.on('message', async (data) => {
         const { room, text, sender } = data;
         console.log(data)
+        await userController.chatHistory(room, text, sender)
         io.to(room).emit('message', { text, sender, room });
     })
 

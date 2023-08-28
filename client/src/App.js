@@ -40,7 +40,7 @@ import Bookings from './Pages/Aritst/bookings';
 import ArtistAdminView from './Pages/Admin/artistView';
 import UserProfile from './Pages/User/userProfile';
 import EditProfile from './Pages/User/editProfile';
-import ArtistProfile from './Pages/Aritst/artistProfile';
+// import ArtistProfile from './Pages/Aritst/artistProfile';
 import AritistEditProfile from './Pages/Aritst/editProfile';
 import UserNotification from './Pages/User/userNotification';
 import ConfirmBooking from './Pages/User/confirmBooking';
@@ -53,28 +53,28 @@ import FullPayment from './Pages/User/fullPayment';
 import AdminBookings from './Pages/Admin/bookings';
 import BookingsView from './Pages/Admin/bookingsView';
 import Rating from './Pages/User/rating';
+import Profile from './Pages/Aritst/profile';
+import GuestPage from './componants/gustPage';
+import ComonPublicRoute from './publicAndProtect/comonPublicRoute';
 
 
 function App() {
   const { loading } = useSelector(state => state.alerts)
   return (
     < BrowserRouter >
-      {/* {loading && (< div className='spinner' >
-        <div class="spinner-border" role="status">
-        </div>
-      </div>)} */}
       {loading && (<div class="fixed top-0 right-0 h-screen w-screen z-50 flex justify-center items-center spinner">
         <div class="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900 spinner-border"></div>
       </div>)}
       <Toaster
         position="top-center" reverseOrder={false} />
       <Routes>
+        <Route path='/' element={<ComonPublicRoute>< GuestPage /></ComonPublicRoute>} />
         <Route path='/login' element={<PublicRoute>< LogIn /></PublicRoute>} />
         <Route path='/signUp' element={<PublicRoute><SignUp /></PublicRoute>} />
         <Route path='/otp' element={<PublicRoute><Otp /></PublicRoute>} />
         <Route path='/forgot' element={<PublicRoute><Forgotpassword /></PublicRoute>} />
         <Route path='/setpassword' element={<PublicRoute><SetPassword /></PublicRoute>} />
-        <Route path='/' element={<ProtectedRoute>< Home /></ProtectedRoute>} />
+        <Route path='/home' element={<ProtectedRoute>< Home /></ProtectedRoute>} />
         <Route path='/profile' element={<ProtectedRoute>< UserProfile /></ProtectedRoute>} />
         <Route path='/editprofile' element={<ProtectedRoute>< EditProfile /></ProtectedRoute>} />
         <Route path='/artist-show' element={<ProtectedRoute>< Artist /></ProtectedRoute>} />
@@ -93,7 +93,7 @@ function App() {
         <Route path='/artist/setpassword' element={<AristsetPassword />} />
         <Route path='/artist/otvalidation' element={<OtpValidationForm />} />
         <Route path='/artist' element={<ArtistProtectedRoute>< ArtistHome /></ArtistProtectedRoute >} />
-        <Route path='/artist/profile' element={<ArtistProtectedRoute>< ArtistProfile /></ArtistProtectedRoute >} />
+        {/* <Route path='/artist/profile' element={<ArtistProtectedRoute>< ArtistProfile /></ArtistProtectedRoute >} /> */}
         <Route path='/artist/edit-profile' element={<ArtistProtectedRoute>< AritistEditProfile /></ArtistProtectedRoute >} />
         <Route path='/artist/artistdetailsform' element={<ArtistProtectedRoute><ArtistDetailsForm /></ArtistProtectedRoute >} />
         <Route path='/artist/notification' element={<ArtistProtectedRoute><Notification /></ArtistProtectedRoute >} />
@@ -102,6 +102,7 @@ function App() {
         <Route path='/artist/bookings' element={<ArtistProtectedRoute><  Bookings /></ArtistProtectedRoute >} />
         <Route path='/artist/upload-post' element={<ArtistProtectedRoute>< PostUpload /></ArtistProtectedRoute >} />
         <Route path='/artist/personal-chating' element={<ArtistProtectedRoute>< AritstPersongalChating /></ArtistProtectedRoute >} />
+        <Route path='/artist/profile' element={<ArtistProtectedRoute>< Profile /></ArtistProtectedRoute>} />
         {/* Admin Side */}
         <Route path='/admin/login' element={<AdminPublicroute>< Adminlogin /></AdminPublicroute >} />
         <Route path='/admin/forgotpassword' element={<ForgotPasswordAdmin />} />

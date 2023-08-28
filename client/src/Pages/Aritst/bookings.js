@@ -15,7 +15,7 @@ function Bookings() {
         try {
             request({
                 url: '/api/artist/get-all-booking-datas',
-                method: 'get',
+                method: 'post',
             }).then((response) => {
                 if (response.data.success) {
                     setBookingData(response.data.data)

@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react'
 import { userRequest } from '../../axios'
 import { toast } from 'react-hot-toast'
 import { formatDistanceToNow } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 
 function ArtistPosts({ artist_id }) {
-    console.log(artist_id)
+    console.log(artist_id, 'artist_id')
     const [media, setMedia] = useState([])
+    const Navigate = useNavigate()
     const getAll = () => {
         userRequest({
             url: '/api/user/all-media',
@@ -13,15 +15,14 @@ function ArtistPosts({ artist_id }) {
             data: { artist_id: artist_id }
         }).then((response) => {
             if (response.data.success) {
-                toast.success(response.data.message)
                 setMedia(response.data.data)
             }
         }).catch((err) => {
-            console.log(err)
             toast.error('please login after try again')
+            localStorage.removeItem('token')
+            Navigate('/login')
         })
     }
-    console.log(media)
     useEffect(() => {
         getAll()
     }, [])

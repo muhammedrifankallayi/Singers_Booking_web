@@ -1,10 +1,14 @@
 import React, { useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import UserHeader from '../../componants/user/userHeader'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import Footer from '../../componants/user/footer'
 import ArtistPosts from '../../componants/user/artistPosts'
 import { formatDistanceToNow } from 'date-fns';
+import { FaStar } from 'react-icons/fa'
+import { setSingleArtist } from '../../Redux/singleArtistSlice'
+import { toast } from 'react-hot-toast'
+import { userRequest } from '../../axios'
 
 function ArtistView() {
     const location = useLocation()
@@ -13,7 +17,8 @@ function ArtistView() {
     const initialReviewsToShow = 2
     const [visibleReviews, setVisibleReviews] = useState(initialReviewsToShow);
     const [showAllRatings, setShowAllRatings] = useState(false);
-
+    const navigate = useNavigate()
+    const dispatch = useDispatch()
     const handleShowMore = () => {
         setShowAllRatings(true);
         setVisibleReviews(rating.reviews.length);
@@ -22,6 +27,29 @@ function ArtistView() {
         setShowAllRatings(false);
         setVisibleReviews(initialReviewsToShow)
     }
+    const bookingArtistView = async (id) => {
+        try {
+            userRequest({
+                url: '/api/user/artist-view',
+                method: 'post',
+                data: { artistId: id }
+            }).then((response) => {
+                if (response.data.success) {
+                    dispatch(setSingleArtist(response.data.data))
+                    navigate('/book-artist')
+                } else {
+
+                }
+            }).catch((error) => {
+                toast.error('somthing went wrong')
+                localStorage.removeItem('token')
+                navigate('/login')
+            })
+        } catch (error) {
+            toast('somthing went wrong ')
+        }
+    }
+
     return (
         <>
             <UserHeader />
@@ -35,7 +63,9 @@ function ArtistView() {
                             <h1 className="text-4xl font-semibold mb-2">{`${data?.firstName} ${data?.lastName}`}</h1>
                             <h5 className="text-indigo-600 text-lg mb-2">{data?.category}</h5>
                             <p className="text-gray-700">{data?.discription}</p>
-                            <h1 className="mt-4 text-2xl font-semibold text-indigo-700">{`Booking rate: ${data?.midBudjet}`}</h1>
+                            <h1
+                                onClick={() => bookingArtistView(data?._id)}
+                                className="mt-4 text-2xl font-semibold text-indigo-700 booking_rate" > {`Booking rate: ${data?.midBudjet}`}</h1>
                         </div>
                     </section >
                     <div className="mt-6" >
@@ -43,13 +73,45 @@ function ArtistView() {
                         <ArtistPosts artist_id={data?.artist_id} />
                     </div >
                     {rating && < div className="mt-6" >
-                        <h2 className="text-2xl font-semibold mb-2">Ratings</h2>
+                        <div className='ratings_Heading_div'>
+                            <h2 className="text-2xl font-semibold mb-2">Ratings</h2>
+                            <div>
+                                <h1 className="text-2xl">Average Rating</h1>
+                                {rating.average < 2 && rating.average >= 1 && (<h1 className="text-2xl">
+                                    {rating.average} <FaStar style={{ color: '#faca15', display: 'inline' }} />
+                                </h1>)}
+
+
+                                {rating.average < 3 && rating.average >= 2 && (<h1 className="text-2xl">
+                                    {rating.average} <FaStar style={{ color: '#faca15', display: 'inline' }} />
+                                    <FaStar style={{ color: '#faca15', display: 'inline' }} />
+                                </h1>)}
+
+                                {rating.average < 4 && rating.average >= 3 && (<h1 className="text-2xl">
+                                    {rating.average} <FaStar style={{ color: '#faca15', display: 'inline' }} />
+                                    <FaStar style={{ color: '#faca15', display: 'inline' }} />
+                                    <FaStar style={{ color: '#faca15', display: 'inline' }} />
+                                </h1>)}
+
+                                {rating.average < 5 && rating.average >= 4 && (<h1 className="text-2xl">
+                                    {rating.average} <FaStar style={{ color: '#faca15', display: 'inline' }} />
+                                    <FaStar style={{ color: '#faca15', display: 'inline' }} />
+                                    <FaStar style={{ color: '#faca15', display: 'inline' }} />
+                                    <FaStar style={{ color: '#faca15', display: 'inline' }} />
+                                </h1>)}
+
+                                {rating.average >= 5 && (<h1 className="text-2xl">
+                                    {rating.average} <FaStar style={{ color: '#faca15', display: 'inline' }} />
+                                    <FaStar style={{ color: '#faca15', display: 'inline' }} />
+                                    <FaStar style={{ color: '#faca15', display: 'inline' }} />
+                                    <FaStar style={{ color: '#faca15', display: 'inline' }} />
+                                    <FaStar style={{ color: '#faca15', display: 'inline' }} />
+                                </h1>)}
+                            </div >
+                        </div>
+
                         <div className="bg-gray-50 rounded-lg shadow-md p-4">
-
                             <div className="mt-4 flex items-center reviews_in_artist_view_page">
-                                {/* <div className="w-6 h-6 bg-yellow-500 rounded-full mr-2"></div>
-                                <p className="text-gray-700">{`Average Rating: ${(data?.ratings)} Stars`}</p> */}
-
                                 {rating?.reviews.slice(0, showAllRatings ? rating?.reviews.length : visibleReviews).map((items) => {
                                     const timeAgo = formatDistanceToNow(new Date(items.timestamp), {
                                         addSuffix: true,
@@ -149,9 +211,6 @@ function ArtistView() {
                             </div >
                         </div>
                     </div >}
-                    {/* {rating?.reviews.length > initialReviewsToShow && showAllRatings && (
-                        <button onClick={handelShowLess} className='block mb-5 text-sm font-medium text-blue-600 hover:underline dark:text-blue-500'>Show less</button>
-                    )} */}
                     <div class="max-w-md mx-auto p-4 flex justify-center">
                         {rating?.reviews.length > initialReviewsToShow && !showAllRatings && (<button
                             id="showMoreBtn"
