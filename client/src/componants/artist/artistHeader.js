@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Fragment } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
-// import io from 'socket.io-client'
+import io from 'socket.io-client'
 import { useDispatch, useSelector } from 'react-redux'
 import './artistHeader.css'
 import { request } from '../../axios'
@@ -10,23 +10,25 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
 import { setArtistMore } from '../../Redux/aritsMoreSlice'
 
+const socket = io('https://spot-light.website/');
 
-const navigation = [
-    { name: 'Home', href: '/artist', current: true },
-    { name: 'bookings', href: '/artist/bookings', current: false },
-    { name: '', href: '#', current: false },
-    { name: '', href: '#', current: false },
-]
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
 function ArtistHeader() {
+
     const navigate = useNavigate()
     const [count, setCount] = useState(0)
+    const [notificaionCount, setNotificationCount] = useState()
     const artistMore = useSelector((state) => state.artistMore.artistMore)
     const dispatch = useDispatch()
+    const [active, setActive] = useState(false)
+    const [navigation, setNavigation] = useState([
+        { name: 'Home', href: '/artist', current: window.location.pathname === '/artist' },
+        { name: 'Bookings', href: '/artist/bookings', current: window.location.pathname === '/artist/bookings' },
+    ]);
     useEffect(() => {
         request({
             url: '/api/artist/get-notification-data',
@@ -36,11 +38,28 @@ function ArtistHeader() {
                 setCount(response.data.data.length)
                 dispatch(setArtistMore(response.data.profile))
             } else {
+                dispatch(setArtistMore(response.data.profile))
                 setCount(0)
             }
         }).catch((err) => {
             toast.error('somthing went wrong')
         })
+
+        socket.on('notifications', (data) => {
+            const { count, room } = data
+            toast.success('You have a notification')
+            setNotificationCount(count)
+        });
+
+        const token = localStorage.getItem('artistKey');
+        const tokenPayload = token ? JSON.parse(atob(token.split('.')[1])) : null;
+        const artistId = tokenPayload ? tokenPayload.id : null;
+        socket.emit('join', artistId);
+
+        return () => {
+            socket.disconnect();
+        }
+
     }, [])
     const signOunt = () => {
         try {
@@ -49,6 +68,26 @@ function ArtistHeader() {
         } catch (error) {
             toast.error('somthing went wrong')
         }
+    }
+
+
+
+
+
+
+    const ChatHistory = () => {
+        request({
+            url: '/api/artist/chat-historys',
+            method: 'get'
+        }).then((response) => {
+            if (response.data.success) {
+                navigate('/artist/chat-history', { state: response.data.chat })
+            } else {
+                toast('No booking users')
+            }
+        }).catch((err) => {
+            toast.error('please login after try again')
+        })
     }
     return (
         <Disclosure as="nav" className="bg-gray-800">
@@ -67,14 +106,11 @@ function ArtistHeader() {
                                     )}
                                 </Disclosure.Button>
                             </div>
+                            <div className="flex flex-shrink-0 items-center spotLight_logo">
+                                <h1 className='user_header_logoHeading'><i className="ri-disc-line"></i>SPOTLIGHT <span className='booking_heading_span'>BOOKING</span></h1>
+                            </div>
                             <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-                                <div className="flex flex-shrink-0 items-center">
-                                    <img
-                                        className="h-8 w-auto"
-                                        src="https://res.cloudinary.com/dqn0v17b6/image/upload/v1691169173/qjlyffmyzk9hgxuemjqs.png"
-                                        alt="Your Company"
-                                    />
-                                </div>
+
                                 <div className="hidden sm:ml-6 sm:block">
                                     <div className="flex space-x-4">
                                         {navigation.map((item) => (
@@ -86,6 +122,7 @@ function ArtistHeader() {
                                                     'rounded-md px-3 py-2 text-sm font-medium'
                                                 )}
                                                 aria-current={item.current ? 'page' : undefined}
+
                                             >
                                                 {item.name}
                                             </a>
@@ -101,7 +138,7 @@ function ArtistHeader() {
                                     <BellIcon className="h-6 w-6" aria-hidden="true" />
                                     <div className='artist_count'>
                                         <h1 >
-                                            {count}
+                                            {notificaionCount ? notificaionCount : count}
                                         </h1>
                                     </div>
                                 </button></a>
@@ -111,11 +148,9 @@ function ArtistHeader() {
                                             <span className="absolute -inset-1.5" />
                                             <span className="sr-only">Open user menu</span>
 
-
                                             < img
                                                 className="h-8 w-8 rounded-full"
-                                                src={artistMore?.image
-                                                }
+                                                src={artistMore?.image}
                                                 alt=""
                                             />
                                         </Menu.Button>
@@ -143,16 +178,6 @@ function ArtistHeader() {
                                             <Menu.Item>
                                                 {({ active }) => (
                                                     <a
-                                                        href="#"
-                                                        className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
-                                                    >
-                                                        Settings
-                                                    </a>
-                                                )}
-                                            </Menu.Item>
-                                            <Menu.Item>
-                                                {({ active }) => (
-                                                    <a
                                                         onClick={() => signOunt()}
                                                         className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
                                                     >
@@ -161,12 +186,17 @@ function ArtistHeader() {
                                                 )}
                                             </Menu.Item>
                                         </Menu.Items>
+
+
                                     </Transition>
                                 </Menu>
+                                <img
+                                    onClick={() => ChatHistory()}
+                                    src='https://res.cloudinary.com/dqn0v17b6/image/upload/v1693390565/d3kvykx09rdjo0nf9rmv.png'
+                                    className='h-8 w-8 ml-3' />
                             </div>
                         </div>
                     </div>
-
                     <Disclosure.Panel className="sm:hidden">
                         <div className="space-y-1 px-2 pb-3 pt-2">
                             {navigation.map((item) => (

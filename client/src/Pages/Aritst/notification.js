@@ -6,22 +6,30 @@ import ViewBooking from './viewBooking'
 import { toast } from 'react-hot-toast'
 import ArtistFooter from '../../componants/artist/artistFooter'
 import { formatDistanceToNow } from 'date-fns';
+import { useDispatch } from 'react-redux'
+import { hideLoading, showLoading } from '../../Redux/alertSlice'
 
 function Notification() {
     const navigate = useNavigate()
     const [notificationData, setnotificationData] = useState()
+    const dispatch = useDispatch()
     useEffect(() => {
+        dispatch(showLoading())
         request({
             url: '/api/artist/get-notification-data',
             method: 'post',
         }).then((response) => {
+            dispatch(hideLoading())
             if (response.data.success) {
                 setnotificationData(response.data.data)
             } else {
 
             }
         }).catch((err) => {
-            console.log('err')
+            dispatch(hideLoading())
+            console.log('please login after try again')
+            localStorage.removeItem('artistKey')
+            navigate('/artist/login')
         })
     }, [])
     const viewBooking = (id) => {
@@ -34,7 +42,6 @@ function Notification() {
 
     const viewCanell = (id) => {
         try {
-            console.log('id', id)
             navigate('/artist/view-cancel', { state: { id } })
         } catch (error) {
             toast.error('Somthing went wrong')
@@ -43,44 +50,6 @@ function Notification() {
     return (
         <>
             <ArtistHeader />
-            {/* <div className='notification_heading'>
-                <div className='notificationH1_div'>
-                    <h2 class="text-4xl font-bold dark:text-white">Notifications</h2>
-                </div>
-                <div className='notificationH1_new ml-10'>
-                    <h2 class="text-2xl font-bold dark:text-white">New</h2>
-                </div>
-                {notificationData?.map((element) => (
-                    <div className='notification_content_div'>
-                        <div className='notification_image_div'>
-                            <img
-                                src='https://res.cloudinary.com/dqn0v17b6/image/upload/v1691211247/lesrewh7hwvv6liguahc.jpg'
-                                className='notification_image'
-                                alt="Notification"
-                                style={{ maxWidth: '100%' }}
-                            />
-                        </div>
-                        <div className='notification_para_div'>
-                            <h6 class="text-lg font-bold dark:text-white">{element?.name}</h6>
-                        </div>
-                        <div className='notification_botton_div'>
-                            {element.Actions === 'show' && < button onClick={() => viewBooking(element?.booking_id)}
-                                type="button"
-                                class="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
-                            >
-                                View
-                            </button>}
-                            {element.Actions === 'Cancell' && < button
-                                type="button"
-                                class="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
-                            >
-                                View
-                            </button>}
-                        </div>
-                    </div>
-                ))}
-            </div > */}
-
             <div className="container mx-auto p-4">
                 <h1 className="text-2xl font-semibold mb-6">Notifications</h1>
                 {notificationData?.slice()

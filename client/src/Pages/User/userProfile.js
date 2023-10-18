@@ -1,29 +1,34 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "antd";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import UserHeader from "../../componants/user/userHeader";
 import Footer from "../../componants/user/footer";
 import { userRequest } from "../../axios";
 import { toast } from "react-hot-toast";
-// import EditProfile from "./editProfile";
+import { useDispatch } from "react-redux";
+import { hideLoading, showLoading } from "../../Redux/alertSlice";
+
 
 
 
 const UserProfile = () => {
     const navigate = useNavigate()
     const [profile, setProfile] = useState([])
+    const dispatch = useDispatch()
     const getData = () => {
+        dispatch(showLoading())
         userRequest({
             url: '/api/user/user_profiledata',
             method: 'post',
         }).then((response) => {
+            dispatch(hideLoading())
             if (response.data.data) {
                 setProfile(response.data.data)
             } else {
 
             }
         }).catch((err) => {
+            dispatch(hideLoading())
             toast('somthing went wrong')
         })
     }

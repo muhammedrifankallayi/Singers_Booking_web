@@ -54,10 +54,6 @@ function BookingsView() {
                     <h3 class="text-lg font-semibold text-gray-800 mb-2">Payment Details</h3>
                     <p class="text-gray-600">Payment ID: {datas.payment_id}</p>
                     <p class="text-gray-600">Status: {datas.status}</p>
-
-                    {/* <div class="border-t border-gray-300 my-4"></div>
-
-                    <p class="text-gray-600 text-xs">{datas.timestamp}</p> */}
                 </div>
             </div >
             <AdminFooter />

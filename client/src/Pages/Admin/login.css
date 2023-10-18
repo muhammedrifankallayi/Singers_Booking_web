@@ -69,6 +69,7 @@
 .category_input {
     background: rgba(128, 128, 128, 0.177);
     border: 1px solid;
+    max-width: 300px;
 }
 
 .category_div {

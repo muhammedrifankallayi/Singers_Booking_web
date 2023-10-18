@@ -1,23 +1,26 @@
 
 import React, { useState } from 'react'
-// import StarRate from '../../componants/user/starRate'
 import { FaStar } from 'react-icons/fa'
 import UserHeader from '../../componants/user/userHeader'
 import Footer from '../../componants/user/footer'
 import { userRequest } from '../../axios'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
+import { useDispatch } from 'react-redux'
+import { hideLoading, showLoading } from '../../Redux/alertSlice'
 function Rating() {
     const [rating, setRating] = useState(null)
     const [hover, setHover] = useState(null)
     const [comant, setComent] = useState('')
     const [title, setTitle] = useState('')
+    const dispatch = useDispatch()
     const location = useLocation()
     const booking_id = location.state
     const navigate = useNavigate()
 
     const handelSubmit = (e) => {
         e.preventDefault()
+        dispatch(showLoading())
         userRequest({
             url: '/api/user/review',
             method: 'post',
@@ -28,6 +31,7 @@ function Rating() {
                 title: title
             }
         }).then((response) => {
+            dispatch(hideLoading())
             if (response.data.success) {
                 toast.success(response.data.message)
                 navigate('/')
@@ -35,7 +39,10 @@ function Rating() {
                 toast.error(response.data.message)
             }
         }).catch((err) => {
+            dispatch(hideLoading())
             toast.error('please login after try again')
+            localStorage.removeItem('token')
+            navigate('/login')
         })
     }
     return (
@@ -84,7 +91,7 @@ function Rating() {
                                         id="company"
                                         name='title'
                                         onChange={(e) => setTitle(e.target.value)}
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Flowbite" required />
+                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Title" required />
                                 </div>
                                 <div class="w-4/4 flex flex-col">
                                     <label for="company" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white rating_lable">Comant</label>
@@ -102,7 +109,7 @@ function Rating() {
                             </form>
                         </div>
                         <div class="h-20 flex items-center justify-center">
-                            <a href="#" class="text-gray-600">Maybe later</a>
+                            <a href="/home" class="text-gray-600">Maybe later</a>
                         </div>
                     </div>
                 </div>

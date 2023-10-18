@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import Adminlayout from '../../componants/admin/Adminlayout'
-import axios from 'axios'
 import { toast } from 'react-hot-toast'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from "react-redux";
-// import { setUser } from '../../Redux/userSlice'
 import Swal from 'sweetalert2';
 import { setArtist } from '../../Redux/artistSlice'
 import { Button } from 'antd'
 import AdminFooter from '../../componants/admin/adminFooter'
+import { adminRequest } from '../../axios'
+import { hideLoading, showLoading } from '../../Redux/alertSlice'
 
 function ArtistList() {
     const [search, setSearch] = useState("")
@@ -16,17 +16,23 @@ function ArtistList() {
     const artist = useSelector((state) => state.artist.artist)
     const Navigate = useNavigate()
     const getData = async () => {
-        try {
-            const response = await axios.post('/api/admin/get-artist-data')
+        dispatch(showLoading())
+        adminRequest({
+            url: '/api/admin/get-artist-data',
+            method: 'get'
+        }).then((response) => {
+            dispatch(hideLoading())
             if (response.data.success) {
                 dispatch(setArtist(response.data.data))
             } else {
                 toast(response.data.message)
-
             }
-        } catch (error) {
-            toast('somthing went wrong')
-        }
+        }).catch((error) => {
+            dispatch(hideLoading())
+            toast.error('plese login after try again')
+            localStorage.removeItem('adminKey')
+            Navigate('/admin/login')
+        })
     }
 
     useEffect(() => {
@@ -45,19 +51,30 @@ function ArtistList() {
                     confirmButtonText: 'Yes, Block it!'
                 }).then(async (result) => {
                     if (result.isConfirmed) {
-                        const response = await axios.patch('/api/admin/block-and-unblock-artist', { id: id, email: email })
-                        if (response.data.success) {
-                            toast.success(response.data.message)
-                            dispatch(setArtist(response.data.data))
-                            Swal.fire(
-                                'Unblocked!',
-                                'Artist has been Unblocked.',
-                                'success'
-                            )
-                        } else {
-                            toast(response.data.message)
-                        }
-
+                        dispatch(showLoading())
+                        adminRequest({
+                            url: '/api/admin/block-and-unblock-artist',
+                            method: 'patch',
+                            data: { id: id, email: email }
+                        }).then((response) => {
+                            dispatch(hideLoading())
+                            if (response.data.success) {
+                                toast.success(response.data.message)
+                                dispatch(setArtist(response.data.data))
+                                Swal.fire(
+                                    'Unblocked!',
+                                    'Artist has been Unblocked.',
+                                    'success'
+                                )
+                            } else {
+                                toast(response.data.message)
+                            }
+                        }).catch((error) => {
+                            dispatch(hideLoading())
+                            toast.error('please login after try again')
+                            localStorage.removeItem('adminKey')
+                            Navigate('/admin/login')
+                        })
                     }
                 })
             } else {
@@ -71,18 +88,30 @@ function ArtistList() {
                     confirmButtonText: 'Yes, Block it!'
                 }).then(async (result) => {
                     if (result.isConfirmed) {
-                        const response = await axios.patch('/api/admin/block-and-unblock-artist', { id: id })
-                        if (response.data.success) {
-                            toast.success(response.data.message)
-                            dispatch(setArtist(response.data.data))
-                            Swal.fire(
-                                'Blocked!',
-                                'Artist has been Blocked.',
-                                'success'
-                            )
-                        } else {
-                            toast(response.data.message)
-                        }
+                        dispatch(showLoading())
+                        adminRequest({
+                            url: '/api/admin/block-and-unblock-artist',
+                            method: 'patch',
+                            data: { id: id }
+                        }).then((response) => {
+                            dispatch(hideLoading())
+                            if (response.data.success) {
+                                toast.success(response.data.message)
+                                dispatch(setArtist(response.data.data))
+                                Swal.fire(
+                                    'Blocked!',
+                                    'Artist has been Blocked.',
+                                    'success'
+                                )
+                            } else {
+                                toast(response.data.message)
+                            }
+                        }).catch((error) => {
+                            dispatch(hideLoading())
+                            toast.error('plase login after try again')
+                            localStorage.removeItem('adminKey')
+                            Navigate('/admin/login')
+                        })
 
                     }
                 })

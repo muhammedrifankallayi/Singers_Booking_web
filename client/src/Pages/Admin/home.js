@@ -6,30 +6,37 @@ import { adminRequest } from '../../axios';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import AdminFooter from '../../componants/admin/adminFooter';
+import { useDispatch } from 'react-redux';
+import { hideLoading, showLoading } from '../../Redux/alertSlice';
 
 function AdminHome() {
     const [bookingData, setBookingData] = useState([])
     const [userData, setUserData] = useState([])
     const [artistData, setArtistData] = useState([])
-
+    const dispatch = useDispatch()
     const navigate = useNavigate()
     const getData = async () => {
         try {
-            await axios.post('/api/admin/get-admin-info-by-id', {},
+            dispatch(showLoading())
+            await axios.post('https://spot-light.website/api/admin/get-admin-info-by-id', {},
                 {
                     headers: {
                         Authorization: 'Bearer ' + localStorage.getItem('adminKey')
                     }
                 })
+            dispatch(hideLoading())
         } catch (error) {
+            dispatch(hideLoading())
             console.log(error)
         }
     }
     const getDashBoardData = () => {
+        dispatch(showLoading())
         adminRequest({
             url: '/api/admin/dash-bord-data',
             method: 'get',
         }).then((response) => {
+            dispatch(hideLoading())
             if (response.data.success) {
                 setBookingData(response.data.data)
                 setArtistData(response.data.artistData)
@@ -38,6 +45,7 @@ function AdminHome() {
                 toast('No booking Datas')
             }
         }).catch((err) => {
+            dispatch(hideLoading())
             toast.error('please login after try again ')
             localStorage.removeItem('adminKey')
             navigate('/admin/login')

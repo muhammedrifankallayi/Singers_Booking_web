@@ -53,7 +53,6 @@ function EditProfile() {
             formDataToSend.append('last_name', formData.last_name);
             formDataToSend.append('mobile', formData.mobile)
             formDataToSend.append('image', formData.image)
-            console.log('formData ToSEnd', formDataToSend)
             dispatch(showLoading())
             userRequest({
                 url: '/api/user/edit-profile',
@@ -66,6 +65,7 @@ function EditProfile() {
                     toast.success(response.data.message)
                 }
             }).catch((err) => {
+                dispatch(hideLoading())
                 localStorage.removeItem('token')
                 toast.error('Somthing went wrong please Login')
                 Navigate('/login')
@@ -75,7 +75,7 @@ function EditProfile() {
     return (
         <>
             <UserHeader />
-            <div className='edit_form_main_div'>
+            <div className='edit_form_main_div mb-4'>
                 <h5 class="text-xl font-bold dark:text-white Edit_profile_heading">Edit Profile</h5>
                 <div className='edit_profile_image_div'>
                     <img src={profile?.profile} className='edit_profile_image' />

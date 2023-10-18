@@ -10,24 +10,27 @@ const artistModel = require("../Models/artistModel");
 const categoryModel = require('../Models/categoryModel')
 const sharp = require('sharp')
 const userNotificationModel = require('../Models/userNotificationModel')
-const Razorpay = require('razorpay')
+const Razorpay = require('razorpay');
 const mongoose = require('mongoose');
 const mediaModel = require('../Models/mediaModel');
 const ratingModel = require('../Models/ratingModel')
 const chatModel = require('../Models/chatModel')
 
 var instance = new Razorpay({
-    key_id: process.env.razorPay_Key_id,
-    key_secret: process.env.razorPay_Key_Secret
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_kEY_SECRET
 });
 
 const cloudinary = require('cloudinary').v2
 cloudinary.config({
-    cloud_name: process.env.cloud_name,
-    api_key: process.env.api_key,
-    api_secret: process.env.api_secret,
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.API_KEY,
+    api_secret: process.env.API_SECRET,
     secure: true,
 });
+
+
+
 
 // date Converting
 const dateFormate = (dates) => {
@@ -59,12 +62,12 @@ const sendVerifyMail = async (name, email) => {
             secure: false,
             requireTLS: true,
             auth: {
-                user: process.env.email,
-                pass: process.env.password
+                user: process.env.EMAIL,
+                pass: process.env.PASSWORD
             }
         })
         const mailOptions = {
-            from: process.env.email,
+            from: process.env.EMAIL,
             to: email,
             subject: 'For verifation mail',
             html: `< p > Hi ${name} this is your otp${otp} `
@@ -183,9 +186,6 @@ const sequirePassword = async (password) => {
 }
 const setPassword = async (req, res) => {
     try {
-        // console.log(req.body.password)
-        // console.log(req.body.conPassword)
-        // console.log(req.session.mobile)
         if (req.body.password === req.body.conPassword && req.body.password.trim().length !== 0) {
             console.log(req.session.mobile);
             const passwordHash = await sequirePassword(req.body.password)
@@ -237,14 +237,20 @@ const profile = async (req, res) => {
 // edit profile
 const editProfile = async (req, res) => {
     try {
+        console.log('CLOUD_NAME:', process.env.CLOUD_NAME);
+        console.log('API_KEY:', process.env.API_KEY);
+        console.log('API_SECRET:', process.env.API_SECRET);
         if (req.file) {
+            console.log('file', req.file)
             const image = req.file.filename;
             await sharp("./uploads/userImages/" + image)
                 .resize(500, 500)
                 .toFile("./uploads/userProfileImages/" + image)
+            console.log('image', image)
             const data = await cloudinary.uploader.upload(
                 "./uploads/userProfileImages/" + image
             );
+            console.log('data', data)
             const cdnUrl = data.secure_url;
             await userModel.findByIdAndUpdate(req.body.userId,
                 {
@@ -257,6 +263,7 @@ const editProfile = async (req, res) => {
 
             return res.status(200).send({ message: 'Profile Updated', success: true, data: userData })
         } else {
+            console.log('no file')
             await userModel.findByIdAndUpdate(req.body.userId,
                 {
                     $set:
@@ -268,6 +275,7 @@ const editProfile = async (req, res) => {
             res.status(200).send({ message: 'Profile updated', success: true, data: userData })
         }
     } catch (error) {
+        console.log('error edit', error)
         res.status(500).send({ message: 'somthing went wrong', success: false })
     }
 }
@@ -408,12 +416,12 @@ const aritistBooking = async (req, res) => {
             })
             await bookingNotification.save()
         }
+        const room = req.body.artist_id.concat(req.body.userId)
         const allNotificaions = await notificationModel.findOne({ artist_id: req.body.artist_id })
         const notificationData = allNotificaions.notifications.filter(notiy => notiy.status === true)
-        res.status(200).send({ message: 'Booking success full', success: true, count: notificationData.length })
+        res.status(200).send({ message: 'Booking success full', success: true, count: notificationData.length, room: room, sender: req.body.userId })
     }
     catch (error) {
-        console.log(error)
         res.status(500).send({ message: 'somthing went wrong', success: false, error })
     }
 }
@@ -445,7 +453,6 @@ const confirmBookingData = async (req, res) => {
         }
         res.status(200).send({ message: 'booking data getting success full', success: true, data: filterdData, category: categoryData.category })
     } catch (error) {
-        console.log(error)
         res.status(500).send({ message: 'somthing went wrong', success: false })
     }
 }
@@ -470,7 +477,7 @@ const verifyPayment = async (req, res) => {
     try {
         const details = (req.body)
         const crypto = require("crypto");
-        let hmac = crypto.createHmac("sha256", process.env.razorPay_Key_Secret)
+        let hmac = crypto.createHmac("sha256", process.env.RAZORPAY_kEY_SECRET)
         hmac.update(details.payment.razorpay_order_id + '|' + details.payment.razorpay_payment_id)
         hmac = hmac.digest('hex')
         const advance = details.order.amount / 100
@@ -508,11 +515,6 @@ const bookingData = async (req, res) => {
     try {
         const bookedData = await bookingModel.aggregate([
             { $unwind: '$orders' }, { $match: { 'orders.user_id': req.body.userId } }
-            // , {
-            //     $match: {
-            //         'orders.status': 'Booked'
-            //     }
-            // }
         ])
         if (!bookedData) {
             return res.status(200).send({ message: 'Booking data no available', success: false })
@@ -558,7 +560,11 @@ const cancelBooking = async (req, res) => {
                     }
                 }
             )
-            return res.status(200).send({ message: 'Booking Cancellation Success Full', success: true, msg: 'amount returnd in your account with in two days' })
+            const live = await notificationModel.findOne({ artist_id: bookData[0].artist_id })
+            const lives = live.notifications.filter((items) => {
+                return items.status === true
+            })
+            return res.status(200).send({ message: 'Booking Cancellation Success Full', success: true, msg: 'amount returnd in your account with in two days', count: lives.length, room: bookData[0].artist_id })
         } else {
             await notificationModel.updateOne({ artist_id: bookData[0].artist_id },
                 {
@@ -579,7 +585,11 @@ const cancelBooking = async (req, res) => {
                     "orders.$.status": "Cancel"
                 }
             })
-            return res.status(200).send({ message: 'Booking Cancellation Success Full', success: true, msg: 'No refund' })
+            const live = await notificationModel.findOne({ artist_id: bookData[0].artist_id })
+            const lives = live.notifications.filter((items) => {
+                return items.status === true
+            })
+            return res.status(200).send({ message: 'Booking Cancellation Success Full', success: true, msg: 'No refund', count: lives.length, room: bookData[0].artist_id })
         }
     } catch (error) {
         res.status(500).send({ message: 'somthing went wrong', success: false })
@@ -605,7 +615,6 @@ const cancelSwal = async (req, res) => {
         res.status(200).send({ message: 'Your advance return within two days', success: true, data: bookingData })
 
     } catch (error) {
-        console.log(error)
         res.status(500).send({ message: 'somthing went wrong', success: false })
     }
 }
@@ -618,7 +627,6 @@ const allMedia = async (req, res) => {
             message: 'mediaData getting successfull ', success: true, data: mediaData
         })
     } catch (error) {
-        console.log(error)
         res.status(500).json(error)
     }
 }
@@ -651,7 +659,6 @@ const getNotifications = async (req, res) => {
 
         res.status(200).send({ message: 'get notification datas', success: true, data: filterdNotificaions.length })
     } catch (error) {
-        console.log(error)
         res.status(500).send({ message: 'somthing went wrong', success: false })
     }
 }
@@ -683,9 +690,6 @@ const notificationCreate = async (req, res) => {
                     }
                 )
             })
-            // 
-            // console.log(bookedData[0].orders._id);
-            // 
             await bookingModel.updateMany(
                 {
                     'orders._id': bookedData[0].orders._id
@@ -710,11 +714,7 @@ const fullPayment = async (req, res) => {
         if (!bookData) {
             return res.status(200).send({ message: 'booking data is empty', success: false })
         }
-        // 
-        // req.session.notification_id = req.body.notification_id
-        // console.log(req.session.notification_id)
         notification_id = req.body.notification_id
-        // 
         res.status(200).send({ message: 'full payment data geted', success: true, data: bookData })
     } catch (error) {
         res.status(500).send({ message: 'somthing went wrong', success: false })
@@ -723,7 +723,6 @@ const fullPayment = async (req, res) => {
 
 const fullpaymentDone = async (req, res) => {
     try {
-        // console.log('session notification_id', req.session.notification_id);
         var options = {
             amount: req.body.balaceAmount * 100,
             currency: "INR",
@@ -740,7 +739,7 @@ const verifyFullPayment = async (req, res) => {
     try {
         const details = (req.body)
         const crypto = require("crypto");
-        let hmac = crypto.createHmac("sha256", process.env.razorPay_Key_Secret)
+        let hmac = crypto.createHmac("sha256", process.env.RAZORPAY_kEY_SECRET)
         hmac.update(details.payment.razorpay_order_id + '|' + details.payment.razorpay_payment_id)
         hmac = hmac.digest('hex')
         const booked = await bookingModel.findOne({ 'orders._id': details.order.receipt }, {
@@ -788,36 +787,13 @@ const verifyFullPayment = async (req, res) => {
             res.status(200).send({ message: 'payment fail', success: false })
         }
     } catch (error) {
-        console.log(error);
         res.status(500).send({ message: 'somthin went wrong', success: false })
     }
 }
 const reviewNotification = async (req, res) => {
     try {
-        console.log(req.body.userId);
         const bookingData = await bookingModel.aggregate([{ $unwind: "$orders" },
         { $match: { 'orders.status': 'Complete', 'orders.user_id': req.body.userId } }])
-        // console.log('bookingData', bookingData)
-        // if (bookingData.length > 0) {
-        //     bookingData.forEach(async (items) => {
-
-        //         const data = await userNotificationModel.find({ user_id: req.body.userId, 'notifications._id': items.orders._id })
-        //         console.log('daataaaa', data);
-        //         await userNotificationModel.updateOne({ user_id: req.body.userId },
-        //             {
-        //                 $push: {
-        //                     notifications:
-        //                     {
-        //                         name: `Hi ${items.orders.firstName}. write review about this artist`,
-        //                         booking_id: items.orders._id,
-        //                         Actions: 'review',
-        //                         timestamp: new Date()
-        //                     }
-        //                 }
-        //             })
-        //     })
-        // }
-
         if (bookingData.length > 0) {
             for (const items of bookingData) {
                 const data = await userNotificationModel.find({
@@ -825,8 +801,7 @@ const reviewNotification = async (req, res) => {
                     'notifications.booking_id': items.orders._id,
                     'notifications.Actions': 'review'
                 });
-
-                if (data.length === 0) {
+                if (data.length >= 0) {
                     await userNotificationModel.updateOne(
                         { user_id: req.body.userId },
                         {
@@ -840,6 +815,12 @@ const reviewNotification = async (req, res) => {
                             }
                         }
                     );
+                    await bookingModel.updateOne({ 'orders._id': items.orders._id }, {
+                        $set: {
+                            'orders.$.status': 'Completed'
+                        }
+                    })
+
                 }
             }
         }
@@ -924,10 +905,11 @@ const writeReview = async (req, res) => {
                     }
                 }
             )
+
+            const notificationData = await userNotificationModel.aggregate([{ $unwind: '$notifications' }, { $match: { 'notifications.Actions': 'review', 'notifications.booking_id': bookingData[0].orders._id.toString() } }])
             await userNotificationModel.updateOne(
                 {
-                    user_id: req.body.userId,
-                    'notifications.Actions': 'review'
+                    'notifications._id': notificationData[0].notifications._id
                 },
                 {
                     $set: { 'notifications.$.status': false }
@@ -954,16 +936,12 @@ const partnerProfileData = async (req, res) => {
         }
         res.status(200).send({ message: 'profile Datas', success: true, data: bookingData })
     } catch (error) {
-        console.log(error)
         res.status(500).send({ message: 'somthing went wrong ', success: false })
     }
 }
 
 const chatHistory = async (room, text, sender) => {
     try {
-        console.log('room', room)
-        console.log('sender', sender)
-        console.log('text', text)
         const userData = await userModel.findById(sender)
         if (userData) {
             var Name = userData.first_name + ' ' + userData.last_name
@@ -1001,7 +979,6 @@ const chatHistory = async (room, text, sender) => {
             await chatHistory.save()
         }
     } catch (error) {
-        console.log(error)
     }
 }
 
@@ -1019,6 +996,45 @@ const getChatHistory = async (req, res) => {
     }
 
 }
+
+const chathistorys = async (req, res) => {
+    try {
+        const bookingData = await bookingModel.aggregate([{ $unwind: '$orders' },
+        { $match: { 'orders.status': 'Booked', 'orders.user_id': req.body.userId } },
+        { $project: { _id: 0, artist_id: 1, 'orders.payment_id': 1 } }])
+
+        if (!bookingData || bookingData.length < 1) {
+            return res.status(200).send({ message: 'Artist Booked Users only the chat option', success: false })
+        }
+
+        res.status(200).send({ message: 'Chat history', success: true, chat: bookingData })
+    } catch (error) {
+        res.status(500).send({ message: 'somthing went wrong', success: false })
+    }
+}
+
+
+const contact = async (req, res) => {
+    try {
+        var artistsData = []
+        for (let i = 0; i < req.body.length; i++) {
+            const artistData = await artistDetailsModel.findOne({
+                artist_id: req.body[i].artist_id
+            })
+            artistsData.push({
+                ...artistData.toObject(),
+                payment_id: req.body[i].orders.payment_id
+            });
+        }
+        if (artistsData.length < 0) {
+            return res.status(200).send({ message: 'somthing went wrong', success: false })
+        }
+        res.status(200).send({ message: 'contact get', success: true, data: artistsData })
+    } catch (error) {
+        res.status(500).send({ messag: 'somting went wrong', success: false })
+    }
+}
+
 
 module.exports = {
     signUp,
@@ -1051,7 +1067,9 @@ module.exports = {
     writeReview,
     partnerProfileData,
     chatHistory,
-    getChatHistory
+    getChatHistory,
+    chathistorys,
+    contact,
 };
 
 

@@ -13,7 +13,7 @@ function Otp() {
     const onFinish = async (value) => {
         try {
             dispatch(showLoading())
-            const response = await axios.post('/api/user/otp', value)
+            const response = await axios.post('https://spot-light.website/api/user/otp', value)
             dispatch(hideLoading())
             if (response.data.success) {
                 toast.success(response.data.message)
@@ -22,6 +22,7 @@ function Otp() {
                 toast.error(response.data.message)
             }
         } catch (error) {
+            dispatch(hideLoading())
             toast('somthing went wrong')
         }
     }

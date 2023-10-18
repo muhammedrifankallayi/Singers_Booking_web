@@ -4,11 +4,16 @@ import React from 'react'
 import { toast } from 'react-hot-toast'
 import { Link, useNavigate } from 'react-router-dom'
 import GusetHeader from '../../publicAndProtect/gusetHeader'
+import { useDispatch } from 'react-redux'
+import { hideLoading, showLoading } from '../../Redux/alertSlice'
 
 function SetPassword() {
     const navigate = useNavigate()
+    const dispatch = useDispatch()
     const onFinish = async (value) => {
-        const response = await axios.post('/api/user/setpassword', value)
+        dispatch(showLoading())
+        const response = await axios.post('https://spot-light.website/api/user/setpassword', value)
+        dispatch(hideLoading())
         if (response.data.success) {
             toast(response.data.message)
             navigate('/login')

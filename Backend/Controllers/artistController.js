@@ -16,9 +16,9 @@ const chatModel = require('../Models/chatModel')
 const ratingModel = require('../Models/ratingModel')
 const cloudinary = require('cloudinary').v2
 cloudinary.config({
-    cloud_name: process.env.cloud_name,
-    api_key: process.env.api_key,
-    api_secret: process.env.api_secret,
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.API_KEY,
+    api_secret: process.env.API_SECRET,
     secure: true,
 });
 // otp generation
@@ -30,19 +30,18 @@ const otpGenerate = () => {
 const sendVerifyMail = async (name, email, otp) => {
     try {
         const subOtp = otp.toString()
-        console.log(otp)
         const trasporter = nodeMailer.createTransport({
             host: 'smtp.gmail.com',
             port: 587,
             secure: false,
             requireTLS: true,
             auth: {
-                user: process.env.email,
-                pass: process.env.password
+                user: process.env.EMAIL,
+                pass: process.env.PASSWORD
             }
         })
         const mailOptions = {
-            from: process.env.email,
+            from: process.env.EMAIL,
             to: email,
             subject: 'For verifation mail',
             html: `<p>hi${name} this is your otp${otp}`
@@ -114,7 +113,7 @@ const login = async (req, res) => {
             return res.status(200).send({ message: 'Password incorrect please check', success: false })
         }
         if (user.otp === 'isVerified') {
-            const token = jwt.sign({ id: user._id }, process.env.artist_Secrect_key, {
+            const token = jwt.sign({ id: user._id }, process.env.ARTIST_SECRET_KEY, {
                 expiresIn: "1d"
             })
             res.status(200).send({ message: 'Login successfull', success: true, data: token })
@@ -169,8 +168,6 @@ const forgotPassword = async (req, res) => {
 }
 const setPassword = async (req, res) => {
     try {
-        // console.log(req.body)
-        // console.log(req.session.email)
         if (req.body.password === req.body.conPassword) {
             const passwordHash = await sequirePassword(req.body.password)
             await artistModel.updateOne({ email: req.session.email }, { $set: { password: passwordHash, otp: 'isVerified' } })
@@ -317,7 +314,7 @@ const editProfile = async (req, res) => {
 const getBannerData = async (req, res) => {
     try {
         const bannerData = await bannerModel.find({ status: true })
-        // const moreData = await artistMoreDetailsModel.findOne({ artist_id: req.body.artistId })
+
         if (!bannerData) {
             return res.status(200).send({ message: 'not get Banner data', success: false })
         }
@@ -349,7 +346,7 @@ const notificationData = async (req, res) => {
         const moreData = await artistMoreDetailsModel.findOne({ artist_id: req.body.artistId })
         const notificationData = await notificationModel.findOne({ artist_id: req.body.artistId })
         if (!notificationData) {
-            return res.status(200).send({ message: 'notificatications are Empty', success: false })
+            return res.status(200).send({ message: 'notificatications are Empty', success: false, profile: moreData })
         }
         const showDatas = notificationData.notifications.filter(trues => trues.status === true)
         res.status(200).send({ message: 'notification Data get', success: true, data: showDatas, profile: moreData })
@@ -379,7 +376,7 @@ const acceptAndReject = async (req, res) => {
         if (req.body.id && req.body.email) {
             await bookingModel.updateOne({ artist_id: req.body.artistId, "orders._id": req.body.id }, { $set: { "orders.$.status": "Rejected" } })
             await notificationModel.updateOne({ artist_id: req.body.artistId, "notifications.booking_id": req.body.id }, { $set: { "notifications.$.status": false } })
-            // editing
+
             const datas = await bookingModel.findOne({ artist_id: req.body.artistId })
             const users = datas.orders.filter((items) => items._id.toString() === req.body.id)
             const booking_id = users[0]._id
@@ -412,17 +409,18 @@ const acceptAndReject = async (req, res) => {
                 })
                 await notificationData.save()
             }
-            // editing end
+
             const userNotification = await userNotificationModel.findOne({ user_id: req.body.user_id })
-            res.status(200).send({ message: 'Booking has been rejected', success: true, userNotification: userNotification.notifications.length })
+            const notificationData = userNotification.notifications.filter(notiy => notiy.status === true)
+            res.status(200).send({ message: 'Booking has been rejected', success: true, userNotification: notificationData.length })
         } else {
             await bookingModel.updateOne({ artist_id: req.body.artistId, "orders._id": req.body.id }, { $set: { "orders.$.status": "Accepted" } })
             await notificationModel.updateOne({ artist_id: req.body.artistId, "notifications.booking_id": req.body.id }, { $set: { "notifications.$.status": false } })
-            // Edited
+
             const datas = await bookingModel.findOne({ artist_id: req.body.artistId })
             const users = datas.orders.filter((items) => items._id.toString() === req.body.id)
             const booking_id = users[0]._id
-            // sub edit
+
             const userNotificationData = await userNotificationModel.findOne({ user_id: req.body.user_id })
             if (userNotificationData) {
                 await userNotificationModel.updateOne({ user_id: req.body.user_id },
@@ -439,7 +437,7 @@ const acceptAndReject = async (req, res) => {
                         }
                     })
             } else {
-                // sub edit end
+
                 const notificationData = new userNotificationModel({
                     user_id: req.body.user_id,
                     notifications: [
@@ -454,8 +452,8 @@ const acceptAndReject = async (req, res) => {
                 await notificationData.save()
             }
             const userNotification = await userNotificationModel.findOne({ user_id: req.body.user_id })
-            // Edited
-            res.status(200).send({ message: 'Booking has been rejected', success: true, userNotification: userNotification.notifications.length })
+            const notificationData = userNotification.notifications.filter(notiy => notiy.status === true)
+            res.status(200).send({ message: 'Booking has been rejected', success: true, userNotification: notificationData.length })
         }
     } catch (error) {
         res.status(500).send({ message: 'somthing went wrong', success: false, })
@@ -466,7 +464,6 @@ const acceptAndReject = async (req, res) => {
 const allBookings = async (req, res) => {
     try {
         const bookingData = await bookingModel.aggregate([{ $unwind: "$orders" }, { $match: { artist_id: req.body.artistId } }])
-        // const acceptedBookings = bookingData.orders.filter(order => order.status === 'Booked')
         if (!bookingData) {
             return res.status(200).send({ message: 'No bookings', success: false })
         }
@@ -511,7 +508,9 @@ const cancelBooking = async (req, res) => {
                 }
             }
         )
-        res.status(200).send({ message: 'Cancellation succuss full', success: true })
+        const notifcation = await userNotificationModel.findOne({ user_id: bookingData[0].orders.user_id })
+        const notificationData = notifcation.notifications.filter(notiy => notiy.status === true)
+        res.status(200).send({ message: 'Cancellation succuss full', success: true, count: notificationData.length, room: bookingData[0].orders.user_id })
     } catch (error) {
         res.status(500).send({ message: '' })
     }
@@ -549,7 +548,7 @@ const createMedia = async (req, res) => {
             res.status(200).send({ message: 'Media updated successfully', success: true });
         }
     } catch (error) {
-        console.log(error);
+
         res.status(500).json(error);
     }
 };
@@ -584,6 +583,60 @@ const getChatHistory = async (req, res) => {
 
 }
 
+const dashbordData = async (req, res) => {
+    try {
+        const bookingData = await bookingModel.aggregate([{ $unwind: '$orders' }, { $match: { artist_id: req.body.artistId } }])
+        const filteredData = bookingData.filter(item => item.orders.status === 'Booked' || item.orders.status === 'Completed' || item.orders.status === 'Complete' || item.orders.status === 'waiting fullPayment');
+        const uniqueUserIds = [];
+        bookingData.filter(item => {
+            if (!uniqueUserIds.includes(item.orders.user_id)) {
+                uniqueUserIds.push(item.orders.user_id);
+                return true;
+            }
+            return false;
+        });
+        if (!filteredData || filteredData.length < 1) {
+            return res.status(200).send({ message: 'Booking Datas Empty', success: false })
+        }
+        res.status(200).send({ message: 'get all booking datas ', success: true, data: filteredData, userData: uniqueUserIds })
+    } catch (error) {
+        res.status(500).send({ message: 'somthing went wrong ', success: false })
+    }
+}
+
+const chathistorys = async (req, res) => {
+    try {
+        const bookingData = await bookingModel.aggregate([{ $unwind: '$orders' },
+        { $match: { 'orders.status': 'Booked', artist_id: req.body.artistId } },
+        { $project: { _id: 0, 'orders.user_id': 1, 'orders.payment_id': 1 } }])
+        if (!bookingData || bookingData.length < 1) {
+            return res.status(200).send({ message: 'No chat history', success: false })
+        }
+        res.status(200).send({ message: 'Chat history', success: true, chat: bookingData })
+    } catch (error) {
+        res.status(500).send({ message: 'somthing went wrong', success: false })
+    }
+}
+const contact = async (req, res) => {
+    try {
+        var usersData = []
+        for (let i = 0; i < req.body.length; i++) {
+            const userData = await userModel.findOne({ _id: req.body[i].orders.user_id })
+            usersData.push({
+                ...userData.toObject(),
+                payment_id: req.body[i].orders.payment_id
+            });
+
+        }
+        if (usersData.length < 0) {
+            return res.status(200).send({ message: 'somthing went wrong', success: false })
+        }
+        res.status(200).send({ message: 'contact get', success: true, data: usersData })
+
+    } catch (error) {
+        res.status(500).send({ messag: 'somting went wrong', success: false })
+    }
+}
 
 module.exports = {
     signUp,
@@ -603,5 +656,8 @@ module.exports = {
     cancelBooking,
     createMedia,
     partnerData,
-    getChatHistory
+    getChatHistory,
+    dashbordData,
+    chathistorys,
+    contact
 }

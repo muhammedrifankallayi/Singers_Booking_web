@@ -5,17 +5,22 @@ import { Button } from 'antd'
 import ArtistFooter from '../../componants/artist/artistFooter'
 import { toast } from 'react-hot-toast'
 import { request } from '../../axios'
+import { useDispatch } from 'react-redux'
+import { hideLoading, showLoading } from '../../Redux/alertSlice'
 
 function ArtistProfile() {
     const [profile, setProfile] = useState([])
     const [personal, setPersonal] = useState([])
     const navigate = useNavigate()
+    const dispatch = useDispatch()
     const getData = () => {
         try {
+            dispatch(showLoading())
             request({
                 url: '/api/artist/get-profile-data',
                 method: 'post',
             }).then((response) => {
+                dispatch(hideLoading())
                 if (response.data.success) {
                     setProfile(response.data.data)
                     setPersonal(response.data.personal)
@@ -23,7 +28,10 @@ function ArtistProfile() {
                     toast('No datas')
                 }
             }).catch((err) => {
-
+                dispatch(hideLoading())
+                toast.error('please login after try again')
+                localStorage.removeItem('artistKey')
+                navigate('/artist/login')
             })
         } catch (error) {
             toast.error('somthing went wrong')

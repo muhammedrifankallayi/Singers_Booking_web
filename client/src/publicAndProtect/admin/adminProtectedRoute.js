@@ -11,7 +11,7 @@ function ProtectedAdminRoute(props) {
     const getUser = async () => {
         try {
             dispatch(showLoading())
-            const response = await axios.post('/api/admin/get-admin-info-by-id',
+            const response = await axios.post('https://spot-light.website/api/admin/get-admin-info-by-id',
                 { adminKey: localStorage.getItem('adminKey') },
                 {
                     headers: {

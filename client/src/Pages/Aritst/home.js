@@ -6,19 +6,24 @@ import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { setArtistMore } from '../../Redux/aritsMoreSlice';
 import ArtistFooter from '../../componants/artist/artistFooter';
+import { hideLoading, showLoading } from '../../Redux/alertSlice';
 
 function ArtistHome() {
     const [banner, setBanner] = useState([])
+    const dispatch = useDispatch()
     const getData = async () => {
         try {
-            const response = await axios.post('/api/artist/get-artisthome-banner-data', {},
+            dispatch(showLoading())
+            const response = await axios.post('https://spot-light.website/api/artist/get-artisthome-banner-data', {},
                 {
                     headers: {
                         Authorization: 'Bearer ' + localStorage.getItem('artistKey')
                     }
                 })
+            dispatch(hideLoading())
             setBanner(response.data.data)
         } catch (error) {
+            dispatch(hideLoading())
             console.log(error)
         }
     }

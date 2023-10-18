@@ -3,12 +3,16 @@ import axios from 'axios'
 import React from 'react'
 import { toast } from 'react-hot-toast'
 import { Link, useNavigate } from 'react-router-dom'
-
+import { hideLoading, showLoading } from '../../Redux/alertSlice'
+import { useDispatch } from 'react-redux'
 function SetPassword() {
     const navigate = useNavigate()
+    const dispatch = useDispatch()
     const onFinish = async (value) => {
         try {
-            const response = await axios.post('/api/admin/setpassword', value)
+            dispatch(showLoading())
+            const response = await axios.post('https://spot-light.website/api/admin/setpassword', value)
+            dispatch(hideLoading())
             if (response.data.success) {
                 toast.success(response.data.message)
                 navigate('/admin/login')
@@ -16,6 +20,7 @@ function SetPassword() {
                 toast(response.data.message)
             }
         } catch (error) {
+            dispatch(hideLoading())
             toast.error('server are slow please check latter')
         }
 

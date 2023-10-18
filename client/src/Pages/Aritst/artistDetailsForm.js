@@ -4,8 +4,14 @@ import { toast } from 'react-hot-toast';
 import axios from 'axios';
 import { request } from '../../axios';
 import useCategoryData from '../../Hooks/categoryHook';
+import { useDispatch } from 'react-redux';
+import { hideLoading, showLoading } from '../../Redux/alertSlice'
+import { useNavigate } from 'react-router-dom';
+
 function ArtistDetailsForm() {
+    const dispatch = useDispatch
     const { categories } = useCategoryData()
+    const navigate = useNavigate()
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -55,13 +61,14 @@ function ArtistDetailsForm() {
             formDataToSend.append('availability', formData.availability);
             formDataToSend.append('discription', formData.discription);
             formDataToSend.append('image', formData.image);
-            console.log(formDataToSend)
+            dispatch(showLoading())
             request({
                 url: "/api/artist/artist-more-details",
                 method: 'post',
                 data: formDataToSend
             })
                 .then((response) => {
+                    dispatch(hideLoading())
                     if (response.data.success === false) {
                         toast(response.data.message)
                     }
@@ -81,7 +88,12 @@ function ArtistDetailsForm() {
                     else {
                         toast.success(response.data.message)
                     }
-                }).catch((err) => toast('please login after try'))
+                }).catch((err) => {
+                    dispatch(hideLoading())
+                    toast.error('please login after try')
+                    localStorage.removeItem('artistKey')
+                    navigate('/artist/login')
+                })
         }
     }
     return (

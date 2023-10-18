@@ -55,13 +55,12 @@ function HomePagePosts() {
                                 <h2>{truncate(videoItem.videos.name, 60)}</h2>
                                 <video
                                     className="w-full"
-                                    // autoPlay
                                     preload="auto"
                                     width="320"
                                     height="240"
                                     controls
                                 >
-                                    <source src={`http://localhost:5000${videoItem.videos.video}`} type="video/mp4" />
+                                    <source src={`https://spot-light.website/${videoItem.videos.video}`} type="video/mp4" />
                                 </video>
                                 <p className="text-xs text-gray-500">{timeAgo}</p>
                             </div>

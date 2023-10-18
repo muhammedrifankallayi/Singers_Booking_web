@@ -4,26 +4,30 @@ import ArtistFooter from '../../componants/artist/artistFooter'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { request } from '../../axios'
 import { toast } from 'react-hot-toast'
+import { useDispatch } from 'react-redux'
+import { hideLoading, showLoading } from '../../Redux/alertSlice'
 
 function ViewCancel() {
     const location = useLocation()
     const data = location.state?.id
-    console.log('data', data)
     const [singleBookingData, setSingleBookingData] = useState([])
     const Navigate = useNavigate()
-
+    const dispatch = useDispatch()
     const getData = () => {
+        dispatch(showLoading())
         request({
             url: '/api/artist/get-booking-data',
             method: 'post',
             data: { booking_id: data }
         }).then((response) => {
+            dispatch(hideLoading())
             if (response.data.success) {
                 setSingleBookingData(response.data.data)
             } else {
                 toast(response.data.message)
             }
         }).catch((err) => {
+            dispatch(hideLoading())
             // localStorage.removeItem('artistKey')
             // Navigate('/artist/login')
         })
@@ -31,12 +35,20 @@ function ViewCancel() {
     useEffect(() => {
         getData()
     }, [])
-    console.log(singleBookingData)
+    const dateFormate = (dates) => {
+        const timestamp = dates;
+        const date = new Date(timestamp);
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+        const formattedDate = `${year}-${month < 10 ? '0' : ''}${month}-${day < 10 ? '0' : ''}${day}`;
+        return formattedDate
+    }
 
     return (
         <>
             <ArtistHeader />
-            <div className='booking_infoArtist'>
+            <div className='booking_infoArtist mb-5'>
                 <div className='info_booking_div'>
                     <div className="px-4 sm:px-0">
                         <h3 className="text-base font-semibold leading-7 text-gray-900">Cancelled Booking</h3>
@@ -61,7 +73,7 @@ function ViewCancel() {
                             </div>
                             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                                 <dt className="text-sm font-medium leading-6 text-gray-900">Date</dt>
-                                <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{singleBookingData?.[0]?.date}</dd>
+                                <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{dateFormate(singleBookingData?.[0]?.date)}</dd>
                             </div>
                             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                                 <dt className="text-sm font-medium leading-6 text-gray-900">Address</dt>
@@ -69,25 +81,6 @@ function ViewCancel() {
                                     {singleBookingData?.[0]?.address}
                                 </dd>
                             </div>
-                            {/* <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                                <div className='booking_view-div'>
-                                    <button
-                                        type="button"
-                                        class="text-white bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
-
-                                    >Accept
-                                    </button>
-                                </div>
-                                <div className='booking_view-div'>
-                                    <button
-                                        type="button"
-                                        class="text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 shadow-lg shadow-red-500/50 dark:shadow-lg dark:shadow-red-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
-
-                                    >Reject
-                                    </button>
-                                </div>
-
-                            </div> */}
                         </dl>
                     </div>
                 </div >

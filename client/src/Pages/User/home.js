@@ -6,19 +6,24 @@ import { Carousel } from 'react-responsive-carousel';
 import Footer from '../../componants/user/footer';
 import 'pure-react-carousel/dist/react-carousel.es.css';
 import HomePagePosts from '../../componants/user/homePagePosts';
+import { useDispatch } from 'react-redux';
+import { hideLoading, showLoading } from '../../Redux/alertSlice';
 function Home() {
     const [banner, setBanner] = useState([])
+    const dispatch = useDispatch()
     const getData = async () => {
         try {
-            const response = await axios.post('/api/user/get-home-banner-data', {},
+            dispatch(showLoading())
+            const response = await axios.post('https://spot-light.website/api/user/get-home-banner-data', {},
                 {
                     headers: {
                         Authorization: 'Bearer ' + localStorage.getItem('token')
                     }
                 })
+            dispatch(hideLoading())
             setBanner(response.data.data);
         } catch (error) {
-            console.log(error)
+            dispatch(hideLoading())
         }
     }
 
@@ -28,39 +33,13 @@ function Home() {
     return (
         <>
             <UserHeader />
-            {/* <div className='artist_home_carosel_div'>
-                <Carousel
-                    autoPlay={true}
-                    infiniteLoop={true}
-                    showThumbs={false}
-                    showStatus={false}
-                    className="responsive-carousel"
-                >
-                    {banner.map((element) => {
-                        return (
-                            < div className='bannershow_div' key={element._id}>
-                                <>
-                                    < img src={element.image} alt="Motorbike Smoke" className='banner_image' />
-                                    <div className="legend">
-                                        <h5>{element.title}</h5>
-                                        <p>{element.discription}</p>
-                                    </div>
-                                </>
-                            </div >)
-                    })
-                    }
-                </Carousel >
-            </div > */}
-
-            {/*  edited*/}
-
             <div className='custom-carousel-wrapper'>
                 <Carousel
                     autoPlay={true}
                     infiniteLoop={true}
                     showThumbs={false}
                     showStatus={false}
-                    className="custom-responsive-carousel"
+                    className="custom-responsive-carousel pb-5"
                 >
                     {banner.map((element) => (
                         <div className='custom-banner-wrapper' key={element._id}>
@@ -75,9 +54,7 @@ function Home() {
                     ))}
                 </Carousel>
             </div>
-
-            {/* edited */}
-            <HomePagePosts />
+            {/* <HomePagePosts /> */}
             < Footer />
 
 

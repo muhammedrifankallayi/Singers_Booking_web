@@ -5,12 +5,15 @@ import { request } from '../../axios'
 import { useNavigate } from 'react-router-dom'
 import Swal from 'sweetalert2';
 import ArtistFooter from '../../componants/artist/artistFooter'
+import io from 'socket.io-client'
 
+const socket = io('https://spot-light.website/');
 function Bookings() {
     const navigate = useNavigate()
     const [bookingData, setBookingData] = useState([])
     const [value, setValue] = useState([])
     const [search, setSearch] = useState("")
+    const [showMore, setShowMore] = useState(2);
     const getData = () => {
         try {
             request({
@@ -25,6 +28,7 @@ function Bookings() {
                     setValue(response.data.data)
                 }
             }).catch((err) => {
+                toast.error('please login after try again')
                 localStorage.removeItem('artistKey')
                 navigate('/artist/login')
             })
@@ -63,6 +67,7 @@ function Bookings() {
                 }).then((response) => {
                     if (response.data.success) {
                         toast.success(response.data.message)
+                        socket.emit('notifications', { count: response.data.count, room: response.data.room })
                     } else {
                         toast.success(response.data.message)
                     }
@@ -74,15 +79,28 @@ function Bookings() {
             }
         })
     }
-    const filtering = (values) => {
-        const val = value.filter((items) => {
-            return values === '' ? items : items.orders.status === values || items.orders.status === 'Finsh'
-        })
-        setBookingData(val)
+    const filtering = (values, secVal) => {
+        if (secVal === 'Completed') {
+            const val = value.filter((items) => {
+                return values === '' ? items : items.orders.status === values || items.orders.status === 'Finsh' || items.orders.status === 'Completed'
+            })
+            setBookingData(val)
+        } else {
+            const val = value.filter((items) => {
+                return values === '' ? items : items.orders.status === values || items.orders.status === 'Finsh'
+            })
+            setBookingData(val)
+        }
+
+    }
+    function handleShowMore() {
+        setShowMore(showMore + 2);
+    }
+    function hideall() {
+        setShowMore(2)
     }
 
     const chatUser = (payment_id) => {
-        console.log(payment_id)
         navigate('/artist/personal-chating', { state: payment_id })
     }
     return (
@@ -97,8 +115,9 @@ function Bookings() {
                                 <div class="dropdown-content">
                                     <a onClick={() => filtering('')}>All</a>
                                     <a onClick={() => filtering('Booked')}>Booked</a>
-                                    <a onClick={() => filtering('Complete')}>Complete</a>
+                                    <a onClick={() => filtering('Complete', 'Completed')}>Complete</a>
                                     <a onClick={() => filtering('Cancel')}>Cancel</a>
+                                    <a onClick={() => filtering('waiting fullPayment')}>payment balance</a>
                                 </div>
                             </div>
                         </div>
@@ -155,14 +174,13 @@ function Bookings() {
                         <tbody>
                             {bookingData?.filter((bookings) => {
                                 return search && search.toLowerCase() === "" ? bookings : bookings?.orders?.firstName.toLowerCase().includes(search.toLowerCase())
-                            })?.map((element, index) => {
+                            })?.slice(0, showMore).map((element, index) => {
                                 return < tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600" >
                                     <td className="w-4 p-4 font-semibold">
                                         {index + 1}
                                     </td>
 
                                     <th scope="row" className="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
-                                        {/* <img className="w-10 h-10 rounded-full" src={element?.orders?.image} alt=" Jese image" /> */}
                                         <div className="pl-3">
                                             <div className="text-base font-semibold">{element?.orders?.firstName}</div>
                                         </div>
@@ -170,9 +188,14 @@ function Bookings() {
                                     <td className="px-6 py-4 font-semibold">
                                         {element?.orders?.fullAmount}
                                     </td>
-                                    <td className="px-6 py-4 font-semibold">
-                                        {element?.orders?.amount}
-                                    </td>
+                                    {element?.orders?.status === 'pending' || element?.orders?.status === 'Accepted' || element?.orders?.status === 'Rejected' ?
+                                        (< td className="px-6 py-4 font-semibold">
+                                            0
+                                        </td>
+                                        ) : (< td className="px-6 py-4 font-semibold">
+                                            {element?.orders?.amount}
+                                        </td>)
+                                    }
                                     <td className="px-6 py-4 font-semibold">
                                         <div className="flex items-center">
                                             {element?.orders?.category}
@@ -209,6 +232,24 @@ function Bookings() {
                             })}
                         </tbody>
                     </table>
+                    {showMore > 1 && showMore !== bookingData.length && showMore < bookingData.length && < div class="max-w-md mx-auto p-4 flex justify-center">
+                        <button
+                            id="showMoreBtn"
+                            onClick={handleShowMore}
+                            class="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none">
+                            Show More
+                        </button>
+                    </div>
+                    }
+                    {showMore >= bookingData.length && bookingData.length != 2 && < div class="max-w-md mx-auto p-4 flex justify-center">
+                        <button
+                            id="showMoreBtn"
+                            onClick={hideall}
+                            class="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none">
+                            Hide
+                        </button>
+                    </div>
+                    }
                 </div >
             </div >
             <ArtistFooter />

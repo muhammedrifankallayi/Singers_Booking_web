@@ -4,25 +4,29 @@ import { adminRequest } from '../../axios'
 import { toast } from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
 import AdminFooter from '../../componants/admin/adminFooter'
-
-
+import { useDispatch } from 'react-redux'
+import { hideLoading, showLoading } from '../../Redux/alertSlice'
 
 function AdminBookings() {
     const [data, setData] = useState([])
     const [search, setSearch] = useState("")
     const [value, setValue] = useState([])
     const navigate = useNavigate()
+    const [showMore, setShowMore] = useState(6)
+    const dispatch = useDispatch()
     const getData = () => {
+        dispatch(showLoading())
         adminRequest({
             url: '/api/admin/get-booking-data',
             method: 'get'
         }).then((response) => {
+            dispatch(hideLoading())
             if (response.data.success) {
-                toast.success(response.data.message)
                 setData(response.data.data)
                 setValue(response.data.data)
             }
         }).catch((err) => {
+            dispatch(hideLoading())
             toast.error('please login after try again')
             localStorage.removeItem('adminKey')
             navigate('/admin/login')
@@ -40,12 +44,27 @@ function AdminBookings() {
         const formattedDate = `${year}-${month < 10 ? '0' : ''}${month}-${day < 10 ? '0' : ''}${day}`;
         return formattedDate
     }
-    const filtering = (values) => {
-        const val = value.filter((items) => {
-            return values === '' ? items : items.orders.status === values
-        })
-        setData(val)
+    const filtering = (values, secVal) => {
+        if (secVal === 'Completed') {
+            const val = value.filter((items) => {
+                return values === '' ? items : items.orders.status === values || items.orders.status === 'Finsh' || items.orders.status === 'Completed'
+            })
+            setData(val)
+        } else {
+            const val = value.filter((items) => {
+                return values === '' ? items : items.orders.status === values
+            })
+            setData(val)
+        }
     }
+
+    function handleShowMore() {
+        setShowMore(showMore + 6);
+    }
+    function hideall() {
+        setShowMore(6)
+    }
+
     const View = (data) => {
         navigate('/admin/bookings-view', { state: data })
     }
@@ -63,7 +82,9 @@ function AdminBookings() {
                                 <div class="dropdown-content">
                                     <a onClick={() => filtering('')}>All</a>
                                     <a onClick={() => filtering('Booked')}>Booked</a>
-                                    <a onClick={() => filtering('Complete')}>Complete</a>
+                                    <a onClick={() => filtering('Complete', 'Completed')}>Complete</a>
+                                    <a onClick={() => filtering('Cancel')}>Cancel</a>
+                                    <a onClick={() => filtering('waiting fullPayment')}>payment balance</a>
                                 </div>
                             </div>
                         </div>
@@ -96,6 +117,9 @@ function AdminBookings() {
                                     Amount
                                 </th>
                                 <th scope="col" class="px-6 py-3">
+                                    Paid
+                                </th>
+                                <th scope="col" class="px-6 py-3">
                                     Category
                                 </th>
                                 <th scope="col" class="px-6 py-3">
@@ -110,10 +134,9 @@ function AdminBookings() {
 
                             {data?.filter((element) => {
                                 return search && search.toLowerCase() === '' ? element : element.orders.artist.toLowerCase().includes(search.toLowerCase())
-                            }).map((itmes) => {
+                            })?.slice(0, showMore).map((itmes) => {
                                 return < tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600" >
                                     <td scope="row" class="">
-                                        {/* <img class="w-10 h-10 rounded-full" src={itmes.orders.image} alt=" Jese image" /> */}
                                         <div class="px-6 py-4 text-base font-semibold">
                                             <div class="text-base font-semibold">{itmes.orders.firstName}</div>
                                         </div>
@@ -124,6 +147,14 @@ function AdminBookings() {
                                     <td class="px-6 py-4 text-base font-semibold">
                                         {itmes.orders.fullAmount}
                                     </td>
+                                    {itmes?.orders?.status === 'pending' || itmes?.orders?.status === 'Accepted' || itmes?.orders?.status === 'Rejected' ?
+                                        (< td className="px-6 py-4 font-semibold">
+                                            0
+                                        </td>
+                                        ) : (< td className="px-6 py-4 font-semibold">
+                                            {itmes?.orders?.amount}
+                                        </td>)
+                                    }
                                     <td class="px-6 py-4 text-base font-semibold">
                                         {itmes.orders.category}
                                     </td>
@@ -143,6 +174,24 @@ function AdminBookings() {
                             }
                         </tbody>
                     </table>
+                    {showMore > 1 && showMore !== data.length && showMore < data.length && < div class="max-w-md mx-auto p-4 flex justify-center">
+                        <button
+                            id="showMoreBtn"
+                            onClick={handleShowMore}
+                            class="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none">
+                            Show More
+                        </button>
+                    </div>
+                    }
+                    {showMore >= data.length && data.length != 6 && < div class="max-w-md mx-auto p-4 flex justify-center">
+                        <button
+                            id="showMoreBtn"
+                            onClick={hideall}
+                            class="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none">
+                            Hide
+                        </button>
+                    </div>
+                    }
                 </div>
             </div >
             <AdminFooter />

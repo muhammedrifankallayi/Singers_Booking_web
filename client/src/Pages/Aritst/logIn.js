@@ -25,7 +25,7 @@ function AristLogin() {
         try {
             event.preventDefault()
             dispatch(showLoading())
-            const response = await axios.post('/api/artist/login', formData)
+            const response = await axios.post('https://spot-light.website/api/artist/login', formData)
             dispatch(hideLoading())
             if (response.data.success) {
                 toast.success(response.data.message)

@@ -1,9 +1,5 @@
 import React, { useState } from 'react'
 import firebase from '../../fireBase/fireBase';
-// import { Button, Form, Input } from 'antd'
-// import { Link } from 'react-router-dom'
-// import axios from 'axios'
-// import './signUp.css'
 import '../User/forgotPassword.css'
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
@@ -40,19 +36,17 @@ function Forgotpassword() {
 
     const onSignInSubmit = async (e) => {
         e.preventDefault()
-        const response = await axios.post("/api/user/forgot", formData)
-        console.log(response.data.success)
+        const response = await axios.post("https://spot-light.website/api/user/forgot", formData)
         if (response.data.success) {
             configureCaptcha()
             const phoneNumber = "+91" + formData.mobile
-            console.log(phoneNumber)
             const appVerifier = window.recaptchaVerifier;
             firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
                 .then((confirmationResult) => {
                     window.confirmationResult = confirmationResult;
-                    console.log('OTP has been sent')
+                    toast.success('OTP has been sent')
                 }).catch((error) => {
-                    console.log('SMS Not send')
+                    toast.error('please check your mobile No')
                     console.log(error)
                 });
         } else {
@@ -78,8 +72,6 @@ function Forgotpassword() {
                 <div className='bg-white rounded-lg shadow-md p-8 max-w-md w-full forgot_form '>
 
                     <h1 className='text-3xl font-bold mb-6 text-center'>Forgot Password</h1>
-
-                    {/* Reset Password Form */}
                     <form onSubmit={onSignInSubmit} className='mb-6'>
                         <div id='sign-in-button'></div>
                         <div className='mb-4'>
@@ -122,8 +114,6 @@ function Forgotpassword() {
                             Submit
                         </button>
                     </form>
-
-                    {/* Link to Login */}
                     <p className='text-center mt-4'>
                         <Link className='text-blue-500 hover:underline' to='/login'>
                             Go to Login

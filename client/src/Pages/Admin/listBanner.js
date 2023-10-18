@@ -1,31 +1,57 @@
 import React from 'react'
 import Adminlayout from '../../componants/admin/Adminlayout'
 import { Button } from 'antd'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import useBannerData from '../../Hooks/bannerHooks'
 import { toast } from 'react-hot-toast'
-import axios from 'axios'
 import { useDispatch } from 'react-redux'
 import { setbanner } from '../../Redux/bannerSlice'
+import AdminFooter from '../../componants/admin/adminFooter'
+import { adminRequest } from '../../axios'
+import { hideLoading, showLoading } from '../../Redux/alertSlice'
+
 
 function ListBanner() {
     const { banners } = useBannerData()
+    const navigate = useNavigate()
     const dispatch = useDispatch(setbanner(banners))
     const listAndUnlist = async (id, unlist) => {
-        try {
-            if (unlist) {
-                const response = await axios.patch('/api/admin/banner-list-unlist', { id: id })
+        if (unlist) {
+            dispatch(showLoading)
+            adminRequest({
+                url: '/api/admin/banner-list-unlist',
+                method: 'patch',
+                data: { id: id }
+            }).then((response) => {
+                dispatch(hideLoading())
                 if (response.data.success) {
                     toast.success(response.data.message)
                 }
-            } else {
-                const response = await axios.patch('/api/admin/banner-list-unlist', { id: id, unlist: unlist })
+            }).catch((error) => {
+                dispatch(hideLoading())
+                toast.error('plese login after try again')
+                localStorage.removeItem('adminKey')
+                navigate('/admin/login')
+            })
+
+        } else {
+            dispatch(showLoading())
+            adminRequest({
+                url: '/api/admin/banner-list-unlist',
+                method: 'patch',
+                data: { id: id, unlist: unlist }
+            }).then((response) => {
+                dispatch(hideLoading())
                 if (response.data.success) {
                     toast.success(response.data.message)
                 }
-            }
-        } catch (error) {
-            toast('somthing went wrong')
+            }).catch((error) => {
+                dispatch(hideLoading())
+                toast.error('plese login after try again')
+                localStorage.removeItem('adminKey')
+                navigate('/admin/login')
+            })
+
         }
     }
     return (
@@ -98,6 +124,7 @@ function ListBanner() {
                 </div >)
                 }
             </div >
+            <AdminFooter />
         </>
     )
 }

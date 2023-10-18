@@ -1,5 +1,5 @@
 import axios from "axios";
-const client = axios.create({ baseURL: "http://localhost:5000" })
+const client = axios.create({ baseURL: "https://spot-light.website/" })
 export const request = ({ ...options }) => {
     client.defaults.headers.common.Authorization = `Bearer ${localStorage.getItem('artistKey')}`
     const onSuccess = (response) => response
@@ -10,8 +10,8 @@ export const request = ({ ...options }) => {
     return client(options).then(onSuccess).catch(onError)
 }
 
-// import axios from "axios";
-const user = axios.create({ baseURL: "http://localhost:5000" })
+
+const user = axios.create({ baseURL: "https://spot-light.website/" })
 export const userRequest = ({ ...options }) => {
     user.defaults.headers.common.Authorization = `Bearer ${localStorage.getItem('token')}`
     const onSuccess = (response) => response
@@ -22,7 +22,7 @@ export const userRequest = ({ ...options }) => {
     return user(options).then(onSuccess).catch(onError)
 }
 
-const admin = axios.create({ baseURL: "http://localhost:5000" })
+const admin = axios.create({ baseURL: "https://spot-light.website/" })
 export const adminRequest = ({ ...options }) => {
     admin.defaults.headers.common.Authorization = `Bearer ${localStorage.getItem('adminKey')}`
     const onSuccess = (response) => response

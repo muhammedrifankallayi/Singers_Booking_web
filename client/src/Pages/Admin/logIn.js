@@ -25,7 +25,7 @@ function Adminlogin() {
         try {
             event.preventDefault()
             dispatch(showLoading())
-            const response = await axios.post('/api/admin/login', formData)
+            const response = await axios.post('https://spot-light.website/api/admin/login', formData)
             dispatch(hideLoading())
             if (response.data.success) {
                 toast.success(response.data.message)
@@ -45,11 +45,9 @@ function Adminlogin() {
             <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8 admin">
 
                 <div className="sm:mx-auto sm:w-full sm:max-w-sm heading_div">
-                    <img
-                        className="mx-auto h-10 w-auto"
-                        src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-                        alt="Your Company"
-                    />
+                    <div className="flex flex-shrink-0 items-center pl-7">
+                        <h1 className='user_header_logoHeadin font-bold ml-11 '><i className="ri-disc-line"></i>SPOTLIGHT <span className='booking_heading_span'>BOOKING</span></h1>
+                    </div>
                     <h2 className=" text-center text-2xl font-bold leading-9 tracking-tight text-gray-900 welcome_text ">
                         Welcome Admin
                     </h2>
@@ -109,13 +107,6 @@ function Adminlogin() {
                             </button>
                         </div>
                     </form>
-
-                    {/* <p className="mt-10 text-center text-sm text-gray-500">
-                    Not a member?{' '}
-                    <Link className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
-                        Start a 14 day free trial
-                    </Link>
-                </p> */}
                 </div >
             </div >
         </>

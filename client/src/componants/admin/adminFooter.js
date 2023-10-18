@@ -18,7 +18,7 @@ function AdminFooter() {
                             <a href="#" class="mr-4 hover:underline md:mr-6">Licensing</a>
                         </li>
                         <li>
-                            <a href="#" class="hover:underline">Contact</a>
+                            <a href="https://www.instagram.com/risvan___/?igshid=OGQ5ZDc2ODk2ZA%3D%3D" class="hover:underline">Contact</a>
                         </li>
                     </ul>
                 </div>

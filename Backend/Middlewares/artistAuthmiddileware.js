@@ -2,21 +2,18 @@ const jwt = require('jsonwebtoken')
 module.exports = async (req, res, next) => {
     try {
         const token = req.headers['authorization'].split(' ')[1]
-        jwt.verify(token, process.env.artist_Secrect_key, (err, decoded) => {
+        jwt.verify(token, process.env.ARTIST_SECRET_KEY, (err, decoded) => {
             if (err) {
-                // console.log(1);
                 return res.status(401).send({
                     message: 'Auth faild',
                     success: false
                 })
             } else {
-                // console.log(2);
                 req.body.artistId = decoded.id
                 next()
             }
         })
     } catch (error) {
-        // console.log(3);
         return res.status(401).send({
             message: 'Auth failed',
             success: false

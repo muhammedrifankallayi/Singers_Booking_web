@@ -4,10 +4,13 @@ import './login.css'
 import axios from 'axios'
 import { toast } from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { hideLoading, showLoading } from '../../Redux/alertSlice'
 
 
 function ForgotPassword() {
     const navigate = useNavigate()
+    const dispatch = useDispatch()
     const [formData, setFormData] = useState({
         email: '',
         otp: false,
@@ -19,14 +22,14 @@ function ForgotPassword() {
             ...prevFormData,
             [name]: value
         }))
-        console.log(formData.email)
     }
     const handelSubmit = async (event) => {
         try {
             event.preventDefault()
-            console.log(formData)
             if (formData.otp === false) {
-                const response = await axios.post('/api/admin/forgotpassword', formData)
+                dispatch(showLoading())
+                const response = await axios.post('https://spot-light.website/api/admin/forgotpassword', formData)
+                dispatch(hideLoading())
                 if (response.data.success) {
                     toast.success(response.data.message)
                     setFormData({ otp: true, responseOtp: response.data.otp })
@@ -34,7 +37,6 @@ function ForgotPassword() {
                     toast.error(response.data.message)
                 }
             } else {
-                // const response = await axios.post('/api/admin/forgotpassword', formData)
                 if (formData.responseOtp === formData.otp) {
                     toast('Create new password')
                     navigate('/admin/setpassword')
@@ -44,7 +46,8 @@ function ForgotPassword() {
 
             }
         } catch (error) {
-            console.log('somthing went wrong', error)
+            dispatch(hideLoading())
+            toast.error('plase login after try again')
         }
     }
     return (

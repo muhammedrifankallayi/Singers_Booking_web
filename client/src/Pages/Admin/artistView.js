@@ -4,14 +4,17 @@ import { useLocation } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
 import { adminRequest } from '../../axios'
 import AdminFooter from '../../componants/admin/adminFooter'
+import { useDispatch } from 'react-redux'
+import { hideLoading, showLoading } from '../../Redux/alertSlice'
 
 function ArtistAdminView() {
     const location = useLocation()
     const [moreData, setMoreData] = useState()
+    const dispatch = useDispatch()
     const artist_id = location.state
-    console.log('artist_idddd', artist_id)
     const getData = async () => {
         try {
+            dispatch(showLoading())
             adminRequest({
                 url: '/api/admin/get-artist-more-data',
                 method: 'post',
@@ -19,12 +22,14 @@ function ArtistAdminView() {
                     artist_id: artist_id
                 }
             }).then((response) => {
+                dispatch(hideLoading())
                 if (response.data.success) {
                     setMoreData(response.data.data)
                 } else {
                     setMoreData([])
                 }
             }).catch((err) => {
+                dispatch(hideLoading())
                 toast('somthing went wrong')
             })
         } catch (error) {
@@ -35,7 +40,6 @@ function ArtistAdminView() {
     useEffect(() => {
         getData()
     }, [])
-    console.log('more datas', moreData)
     return (
         <>
             <Adminlayout />

@@ -3,10 +3,13 @@ import React, { useState } from 'react'
 import { toast } from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
 import Adminloginhead from '../../publicAndProtect/Artist/Adminloginhead'
+import { useDispatch } from 'react-redux'
+import { hideLoading, showLoading } from '../../Redux/alertSlice'
 
 
 function ArtistforgotPassword() {
     const navigate = useNavigate()
+    const dispatch = useDispatch()
     const [formData, setFormData] = useState({
         email: '',
         otp: false,
@@ -22,9 +25,10 @@ function ArtistforgotPassword() {
     const handelSubmit = async (event) => {
         try {
             event.preventDefault()
-            console.log(formData.otp.length)
             if (formData.otp === false) {
-                const response = await axios.post('/api/artist/forgotpassword', formData)
+                dispatch(showLoading())
+                const response = await axios.post('https://spot-light.website/api/artist/forgotpassword', formData)
+                dispatch(hideLoading())
                 if (response.data.success) {
                     toast.success(response.data.message)
                     setFormData({ otp: true, responseOtp: response.data.otp })
@@ -32,8 +36,6 @@ function ArtistforgotPassword() {
                     toast.error(response.data.message)
                 }
             } else {
-                console.log(formData.responseOtp, 'respose')
-                console.log(formData.otp, 'otp')
                 if (formData.responseOtp === formData.otp) {
                     toast('Create new password')
                     navigate('/artist/setpassword')
@@ -42,6 +44,7 @@ function ArtistforgotPassword() {
                 }
             }
         } catch (error) {
+            dispatch(hideLoading())
             console.log('somthing went wrong', error)
         }
     }

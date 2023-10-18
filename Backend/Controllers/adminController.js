@@ -74,10 +74,6 @@ const sendVerifyMail = async (name, email, otp) => {
 // login
 const login = async (req, res) => {
     try {
-        // const passwordHash = await sequirePassword(req.body.password)
-        // req.body.password = passwordHash
-        // const newUser = new adminModel(req.body)
-        // newUser.save()
         const admin = await adminModel.findOne({ email: req.body.email })
         if (!admin) {
             return res.status(200).send({ message: 'User Does not exist', success: false })
@@ -87,7 +83,7 @@ const login = async (req, res) => {
             return res.status(200)
                 .send({ message: 'password inccorect please check', success: false })
         }
-        const token = jwt.sign({ id: admin._id }, process.env.admin_Secret_key, {
+        const token = jwt.sign({ id: admin._id }, process.env.ADMIN_SECRET_KEY, {
             expiresIn: "1d"
         })
         res.status(200).send({ message: 'Login successfull', success: true, data: token })
@@ -100,7 +96,6 @@ const authorization = async (req, res) => {
     try {
         const admin = await adminModel.findOne({ _id: req.body.adminId })
         if (!admin) {
-            console.log('notExist')
             return res.status(200)
                 .send({ message: 'admin does not Exist', success: false })
         } else {
@@ -271,26 +266,7 @@ const listAndUnlistCategory = async (req, res) => {
 
 const addbanner = async (req, res) => {
     try {
-        // if (req.body.title.trim().length === 0) {
-        //     return res.status(200).send({ message: 'Space not allowed', success: 'title' })
-        // } else if (req.body.discription.trim().length === 0) {
-        //     return res.status(200).send({ message: 'Space not allowed', success: false })
-        // } else {
-        //     const bannerDatas = await bannerModel.findOne({ title: req.body.title })
-        //     const banner = await bannerModel.findOne({ discription: req.body.discription })
-        //     if (bannerDatas) {
-        //         return res.status(200).send({ message: 'Title already exist', success: 'titles' })
-        //     } else if (banner) {
-        //         return res.status(200).send({ message: 'Discription allready exist', success: 'discription' })
-        //     }
-        //     const image = req.body.image
-        //     const uploadImage = await cloudinary.uploader.upload(image, opts)
-        //     req.body.image = uploadImage.secure_url
-        //     const bannerData = new bannerModel(req.body)
-        //     await bannerData.save()
-        //     res.status(200).send({ message: 'Banner added success full', success: true })
-        // }
-        console.log('hellos')
+
         const image = req.file.filename;
         await sharp("./uploads/artistImages/" + image)
             .resize(1000, 500)
@@ -305,11 +281,9 @@ const addbanner = async (req, res) => {
             image: cdnUrl
         })
         const datas = await bannerData.save()
-        console.log(datas)
         res.status(200).send({ message: 'banner data added success full', success: true })
 
     } catch (error) {
-        console.log(error)
         res.status(500).send({ message: 'somthing went wrong', error })
     }
 }
@@ -358,7 +332,6 @@ const dashBoardData = async (req, res) => {
         }
         res.status(200).send({ messge: 'Datas get', success: true, data: bookingData, userData: userData, artistData: artistData })
     } catch (error) {
-        console.log(error)
         res.status(500).send({ message: 'somthing went wrong', success: false })
     }
 }

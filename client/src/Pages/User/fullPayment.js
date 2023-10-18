@@ -4,25 +4,30 @@ import UserHeader from '../../componants/user/userHeader'
 import Footer from '../../componants/user/footer'
 import { userRequest } from '../../axios'
 import { toast } from 'react-hot-toast'
-import { loadScript } from 'https://checkout.razorpay.com/v1/checkout.js';
+// import { loadScript } from 'https://checkout.razorpay.com/v1/checkout.js';
+import { useDispatch } from 'react-redux'
+import { hideLoading, showLoading } from '../../Redux/alertSlice'
 
 function FullPayment() {
     const location = useLocation()
     const Data = location.state
-    console.log('Datadkfdk', Data)
     const { booking_id, notification_id } = Data
     const navigator = useNavigate()
+    const dispatch = useDispatch()
     const [booking, setBookings] = useState([])
     const getData = () => {
+        dispatch(showLoading())
         userRequest({
             url: '/api/user/full-payment-booking',
             method: 'post',
             data: { id: booking_id, notification_id: notification_id }
         }).then((response) => {
+            dispatch(hideLoading())
             if (response.data.success) {
                 setBookings(response.data.data)
             }
         }).catch((err) => {
+            dispatch(hideLoading())
             toast.error('please login after try again')
             localStorage.removeItem('token')
             navigator('/login')
@@ -42,13 +47,16 @@ function FullPayment() {
         return formattedDate
     }
     const fullPayment = async (id, balaceAmount) => {
+        dispatch(showLoading())
         userRequest({
             url: '/api/user/full-payment',
             method: 'patch',
             data: { id: id, balaceAmount: balaceAmount }
         }).then((response) => {
+            dispatch(hideLoading())
             razorpayPayment(response.data.data)
         }).catch((err) => {
+            dispatch(hideLoading())
             toast.error('please login after try again')
             localStorage.removeItem('token')
             navigator('/login')
@@ -84,11 +92,13 @@ function FullPayment() {
         rzp1.open();
     }
     const verifyPayment = async (payment, order) => {
+        dispatch(showLoading())
         userRequest({
             url: '/api/user/verify-full-payment',
             method: 'patch',
             data: { payment: payment, order: order }
         }).then((response) => {
+            dispatch(hideLoading())
             if (response.data.success) {
                 toast.success(response.data.message)
                 navigator('/bookings')
@@ -96,6 +106,7 @@ function FullPayment() {
                 toast.error(response.data.message)
             }
         }).catch((err) => {
+            dispatch(hideLoading())
             toast.error('please login after try again')
             localStorage.removeItem('token')
             navigator('/login')

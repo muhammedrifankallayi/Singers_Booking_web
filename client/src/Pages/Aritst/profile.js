@@ -6,6 +6,8 @@ import ArtistFooter from '../../componants/artist/artistFooter'
 import { toast } from 'react-hot-toast'
 import { request } from '../../axios'
 import { formatDistanceToNow } from 'date-fns';
+import { useDispatch } from 'react-redux'
+import { hideLoading, showLoading } from '../../Redux/alertSlice'
 function Profile() {
     const [profile, setProfile] = useState([])
     const [personal, setPersonal] = useState([])
@@ -15,12 +17,15 @@ function Profile() {
     const initialReviewsToShow = 2
     const [visibleReviews, setVisibleReviews] = useState(initialReviewsToShow);
     const [showAllRatings, setShowAllRatings] = useState(false);
+    const dispatch = useDispatch()
     const getData = () => {
         try {
+            dispatch(showLoading())
             request({
                 url: '/api/artist/get-profile-data',
                 method: 'post',
             }).then((response) => {
+                dispatch(hideLoading())
                 if (response.data.success) {
                     setProfile(response.data.data)
                     setPersonal(response.data.personal)
@@ -31,6 +36,7 @@ function Profile() {
                     setPersonal(response.data.personal)
                 }
             }).catch((err) => {
+                dispatch(hideLoading())
                 localStorage.removeItem('artistKey')
                 navigate('/login')
             })
@@ -85,12 +91,12 @@ function Profile() {
                         <p class="text-gray-700">{profile?.category}</p>
                         <p class="text-sm text-gray-500">{personal?.email}</p>
                     </div>
-                    {media?.length > 0 && < div className='post_container_div'>
+                    {/* {media?.length > 0 && < div className='post_container_div'>
                         <p class="text-2xl post_container">posts</p>
                         <div className='post_count'>
                             <p class="text-2xl count">{media?.length}</p>
                         </div>
-                    </div>}
+                    </div>} */}
                     <div class="flex-1 flex flex-col items-center lg:items-end justify-end px-8 mt-2">
                         <div class="flex items-center space-x-4 mt-2">
                             {!profile?.midBudjet && < a href='/artist/artistdetailsform'>  <button
@@ -102,11 +108,17 @@ function Profile() {
                                 class="flex items-center bg-blue-600 hover:bg-blue-700 text-gray-100 px-4 py-2 rounded text-sm space-x-2 transition duration-100">
                                 <span>Edit</span>
                             </button>
-                                <button
+                                {/* <button
                                     onClick={() => navigate('/artist/upload-post')}
                                     class="flex items-center bg-blue-600 hover:bg-blue-700 text-gray-100 px-4 py-2 rounded text-sm space-x-2 transition duration-100">
                                     <span>Upload Post</span>
-                                </button></>)
+                                </button> */}
+                                <button
+                                    onClick={() => navigate('/artist/dash-bord')}
+                                    class="flex items-center bg-blue-600 hover:bg-blue-700 text-gray-100 px-4 py-2 rounded text-sm space-x-2 transition duration-100">
+                                    <span>Dashbord</span>
+                                </button>
+                            </>)
                             }
                         </div>
                     </div>
@@ -148,46 +160,6 @@ function Profile() {
                     </div>
                 </div>
                 }
-                {media?.length > 0 &&
-                    <div class="bg-white rounded-lg shadow-xl p-8">
-                        <div class="flex items-center justify-between">
-                            <h4 class="text-xl text-gray-900 font-bold">Posts ({media?.length})</h4>
-                        </div>
-
-
-                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-8 mt-8">
-
-
-                            {
-                                media
-                                    ?.reverse()
-                                    ?.map((videoItem) => {
-                                        const timeAgo = formatDistanceToNow(new Date(videoItem.createdAt), {
-                                            addSuffix: true
-                                        });
-                                        return (
-                                            <a class="flex flex-col items-center justify-center text-gray-800 hover:text-blue-600" title="View Profile">
-                                                <div key={videoItem._id} >
-                                                    <h2>{truncate(videoItem.videos.name, 60)}</h2>
-                                                    <video
-                                                        className="w-full"
-                                                        // autoPlay
-                                                        preload="auto"
-                                                        width="320"
-                                                        height="240"
-                                                        controls
-                                                    >
-                                                        <source src={`http://localhost:5000${videoItem.videos.video}`} type="video/mp4" />
-                                                    </video>
-                                                    <p className="text-xs text-gray-500">{timeAgo}</p>
-                                                </div>
-
-                                            </a>
-                                        );
-                                    })}
-                        </div>
-                    </div>}
-
                 {rating && < div class="bg-white rounded-lg shadow-xl p-8">
                     <h1 className="text-2xl pb-3">Ratings</h1>
                     <div class="flex items-center">

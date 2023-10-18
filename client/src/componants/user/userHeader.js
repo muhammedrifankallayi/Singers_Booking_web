@@ -7,13 +7,11 @@ import { toast } from 'react-hot-toast'
 import { userRequest } from '../../axios'
 import { useDispatch, useSelector } from 'react-redux'
 
-// import io from 'socket.io-client'
-
+import io from 'socket.io-client'
+const socket = io('https://spot-light.website/');
 const navigation = [
-    { name: 'Home', href: '/', current: true },
-    { name: 'Aritst', href: '/artist-show', current: false },
-    { name: '', href: '#', current: false },
-    { name: '', href: '#', current: false },
+    { name: 'Home', href: '/home', current: window.location.pathname === '/home' },
+    { name: 'Aritst', href: '/artist-show', current: window.location.pathname === '/artist-show' },
 ]
 
 function classNames(...classes) {
@@ -23,6 +21,7 @@ function classNames(...classes) {
 
 function UserHeader() {
     const [count, setCount] = useState()
+    const [notificationCounts, setNotifications] = useState()
     const [image, setImage] = useState('')
     const navigate = useNavigate()
     const signOut = () => {
@@ -33,16 +32,6 @@ function UserHeader() {
             toast.error('somthing went wrong')
         }
     }
-    // var newSocket = io('http://localhost:5000');
-    // useEffect(() => {
-    //     newSocket.on('chat message', (message) => {
-    //         console.log('Received message: risvan', message);
-    //         setCount(message)
-    //     });
-    //     // return () => {
-    //     //     newSocket.disconnect();
-    //     // };
-    // }, [])
 
     const getData = async (req, res) => {
         try {
@@ -92,7 +81,36 @@ function UserHeader() {
         getNotifications()
         getFullpayNOtification()
         getReviewNotificaion()
+        socket.on('notifications', (data) => {
+            const { count, room } = data
+            toast.success('You have a notification')
+            setNotifications(count)
+        });
+
+        const token = localStorage.getItem('token');
+        const tokenPayload = token ? JSON.parse(atob(token.split('.')[1])) : null;
+        const artistId = tokenPayload ? tokenPayload.id : null;
+        socket.emit('join', artistId);
+
+        return () => {
+            socket.disconnect();
+        }
     }, [])
+
+    const ChatHistory = () => {
+        userRequest({
+            url: '/api/user/chat-historys',
+            method: 'get'
+        }).then((response) => {
+            if (response.data.success) {
+                navigate('/chat-history', { state: response.data.chat })
+            } else {
+                toast(response.data.message)
+            }
+        }).catch((err) => {
+            toast.error('please login after try again')
+        })
+    }
 
     return (
         <Disclosure as="nav" className="bg-gray-800 nav_bar_user shadow-lg">
@@ -101,7 +119,6 @@ function UserHeader() {
                     <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8 shadow-lg">
                         <div className="relative flex h-16 items-center justify-between ">
                             <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
-                                {/* Mobile menu button*/}
                                 <Disclosure.Button className="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
                                     <span className="absolute -inset-0.5" />
                                     <span className="sr-only">Open main menu</span>
@@ -112,14 +129,10 @@ function UserHeader() {
                                     )}
                                 </Disclosure.Button>
                             </div>
+                            <div className="flex flex-shrink-0 items-center spotLight_logo">
+                                <h1 className='user_header_logoHeading'><i className="ri-disc-line"></i>SPOTLIGHT <span className='booking_heading_span'>BOOKING</span></h1>
+                            </div>
                             <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-                                <div className="flex flex-shrink-0 items-center">
-                                    <img
-                                        className="h-8 w-auto"
-                                        src="https://res.cloudinary.com/dqn0v17b6/image/upload/v1691169173/qjlyffmyzk9hgxuemjqs.png"
-                                        alt="Your Company"
-                                    />
-                                </div>
                                 <div className="hidden sm:ml-6 sm:block">
                                     <div className="flex space-x-4">
                                         {navigation.map((item) => (
@@ -146,12 +159,10 @@ function UserHeader() {
                                     <BellIcon className="h-6 w-6" aria-hidden="true" />
                                     <div className='artist_count'>
                                         <h1 >
-                                            {count}
+                                            {notificationCounts ? notificationCounts : count}
                                         </h1>
                                     </div>
                                 </button></a>
-
-                                {/* Profile dropdown */}
                                 <Menu as="div" className="relative ml-3">
                                     <div>
                                         <Menu.Button className="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
@@ -187,16 +198,6 @@ function UserHeader() {
                                             <Menu.Item>
                                                 {({ active }) => (
                                                     <a
-                                                        href="#"
-                                                        className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
-                                                    >
-                                                        Settings
-                                                    </a>
-                                                )}
-                                            </Menu.Item>
-                                            <Menu.Item>
-                                                {({ active }) => (
-                                                    <a
                                                         onClick={() => signOut()}
                                                         className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
                                                     >
@@ -207,6 +208,10 @@ function UserHeader() {
                                         </Menu.Items>
                                     </Transition>
                                 </Menu>
+                                <img
+                                    onClick={() => ChatHistory()}
+                                    src='https://res.cloudinary.com/dqn0v17b6/image/upload/v1693390565/d3kvykx09rdjo0nf9rmv.png'
+                                    className='h-8 w-8 ml-3' />
                             </div>
                         </div>
                     </div>

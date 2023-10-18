@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import Adminlayout from '../../componants/admin/Adminlayout';
-import axios from 'axios';
 import { toast } from 'react-hot-toast';
-import useCategoryData from '../../Hooks/categoryHook';
 import { Button, message } from 'antd';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { adminRequest } from '../../axios';
 import AdminFooter from '../../componants/admin/adminFooter';
+import { useDispatch } from 'react-redux';
+import { hideLoading, showLoading } from '../../Redux/alertSlice';
 
 function AddBanner() {
+    const navigate = useNavigate()
+    const dispatch = useDispatch()
     const [validations, setValidataion] = useState({
         message: '',
         status: ''
@@ -25,12 +27,9 @@ function AddBanner() {
             ...formData,
             [name]: value
         });
-        console.log(formData, 'ehjllooo')
     };
     const imageInputOnchange = (event) => {
-        console.log('hello')
         const file = event.target.files[0]
-        console.log(file)
         if (file) {
             setFormData((prevFormData) => ({
                 ...prevFormData,
@@ -38,48 +37,9 @@ function AddBanner() {
             }))
         }
     }
-    // const convertBase64 = (file) => {
-    //     return new Promise((resolve, reject) => {
-    //         const fileReader = new FileReader();
-    //         fileReader.readAsDataURL(file);
-
-    //         fileReader.onload = () => {
-    //             resolve(fileReader.result);
-    //         };
-
-    //         fileReader.onerror = (error) => {
-    //             reject(error);
-    //         };
-    //     });
-    // };
-
-    // const imageInputOnchange = async (event) => {
-    //     const files = event.target.files;
-    //     const base64 = await convertBase64(files[0])
-    //     setFormData({
-    //         ...formData,
-    //         image: base64
-    //     })
-    //     console.log(formData, 'hai')
-    //     return;
-    // }
-
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        // const response = await axios.post('/api/admin/addbanner', formData)
-        // if (response.data.success === 'title') {
-        //     setValidation(response.data.message)
-        //     setValidation({ message: response.data.message, status: 'title' })
-        // } else if (response.data.success === true) {
-        //     toast.success(response.data.message)
-        // } else if (response.data.success === 'titles') {
-        //     toast.error(response.data.message)
-        // } else if (response.data.success === 'discription') {
-        //     toast.error(response.data.message)
-        // } else {
-        //     setValidation({ message: response.data.message, status: false })
-        // }
         if (formData.title.trim().length === 0) {
             setValidataion({ message: 'space not allowed', status: 'title' })
         } else if (formData.discription.trim().length === 0) {
@@ -91,23 +51,24 @@ function AddBanner() {
             formDataToSend.append('title', formData.title);
             formDataToSend.append('discription', formData.discription);
             formDataToSend.append('image', formData.image);
+            dispatch(showLoading())
             adminRequest({
                 url: '/api/admin/addbanner',
                 method: 'post',
                 data: formDataToSend
             }).then((response) => {
+                dispatch(hideLoading())
                 if (response.data.success) {
                     toast('get datas')
                 }
             }).catch((err) => {
-                console.log(err)
+                dispatch(hideLoading())
                 toast('please login after tray again')
+                localStorage.removeItem('adminKey')
+                navigate('/admin/login')
             })
         }
     }
-
-
-
 
     return (
         <>

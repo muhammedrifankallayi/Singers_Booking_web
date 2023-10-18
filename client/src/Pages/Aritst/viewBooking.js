@@ -4,26 +4,33 @@ import { request } from '../../axios'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
 import Swal from 'sweetalert2'
-// import io from 'socket.io-client'
-// import { isRejected } from '@reduxjs/toolkit'
+import ArtistFooter from '../../componants/artist/artistFooter'
+import io from 'socket.io-client'
+import { useDispatch } from 'react-redux'
+import { hideLoading, showLoading } from '../../Redux/alertSlice'
+const socket = io('https://spot-light.website/');
 
 function ViewBooking() {
     const location = useLocation()
     const Navigate = useNavigate()
     const data = location.state?.id
+    const dispatch = useDispatch()
     const [singleBookingData, setSingleBookingData] = useState([])
     const getData = () => {
+        dispatch(showLoading())
         request({
             url: '/api/artist/get-booking-data',
             method: 'post',
             data: { booking_id: data }
         }).then((response) => {
+            dispatch(hideLoading())
             if (response.data.success) {
                 setSingleBookingData(response.data.data)
             } else {
                 toast(response.data.message)
             }
         }).catch((err) => {
+            dispatch(hideLoading())
             localStorage.removeItem('artistKey')
             Navigate('/artist/login')
         })
@@ -31,16 +38,7 @@ function ViewBooking() {
     useLayoutEffect(() => {
         getData()
     }, [])
-    // var newSocket = io('http://localhost:5000');
-    // useEffect(() => {
 
-    // newSocket.on('chat message', (message) => {
-    //     console.log('Received message:', message);
-    // });
-    // return () => {
-    //     newSocket.disconnect();
-    // };
-    // }, []);
 
     const acceptAndReject = (id, user_id, email) => {
         if (id && email) {
@@ -54,22 +52,24 @@ function ViewBooking() {
                 confirmButtonText: 'Yes, reject it!'
             }).then(async (result) => {
                 if (result.isConfirmed) {
+                    dispatch(showLoading())
                     request({
                         url: '/api/artist/accept_and_reject',
                         method: 'post',
                         data: { id: id, email: email, user_id: user_id }
                     }).then(async (response) => {
+                        dispatch(hideLoading())
                         if (response.data.success) {
-                            console.log('rejected')
                             await Swal.fire(
                                 'Rejected!',
                                 'booking has been rejected.',
                                 'success'
                             )
-                            // newSocket.emit('chat message', response.data.userNotification)
+                            socket.emit('notifications', { count: response.data.userNotification, room: user_id })
                             Navigate('/artist/notification')
                         }
                     }).catch((err) => {
+                        dispatch(hideLoading())
                         console.log(err)
                     })
                 }
@@ -85,35 +85,44 @@ function ViewBooking() {
                 confirmButtonText: 'Yes, accept it!'
             }).then(async (result) => {
                 if (result.isConfirmed) {
-                    console.log(id, email, user_id)
+                    dispatch(showLoading())
                     request({
                         url: '/api/artist/accept_and_reject',
                         method: 'post',
                         data: { id: id, user_id: user_id }
                     }).then(async (response) => {
-                        console.log('accepted')
+                        dispatch(hideLoading())
                         if (response.data.success) {
                             await Swal.fire(
                                 'Accepted!',
                                 'booking has been accepted.',
                                 'success'
                             )
-                            // newSocket.emit('chat message', response.data.userNotification)
+                            socket.emit('notifications', { count: response.data.userNotification, room: user_id })
                             Navigate('/artist/bookings')
                         }
                     }).catch((err) => {
+                        dispatch(hideLoading())
                         console.log(err)
                     })
                 }
             })
         }
     }
-
+    const dateFormate = (dates) => {
+        const timestamp = dates;
+        const date = new Date(timestamp);
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+        const formattedDate = `${year}-${month < 10 ? '0' : ''}${month}-${day < 10 ? '0' : ''}${day}`;
+        return formattedDate
+    }
     return (
         <>
             <ArtistHeader />
-            <div className='booking_infoArtist'>
-                <div className='info_booking_div'>
+            <div className='booking_infoArtist '>
+                <div className='info_booking_div mb-5'>
                     <div className="px-4 sm:px-0">
                         <h3 className="text-base font-semibold leading-7 text-gray-900">Booking Information</h3>
                     </div>
@@ -137,7 +146,7 @@ function ViewBooking() {
                             </div>
                             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                                 <dt className="text-sm font-medium leading-6 text-gray-900">Date</dt>
-                                <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{singleBookingData[0]?.date}</dd>
+                                <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{dateFormate(singleBookingData[0]?.date)}</dd>
                             </div>
                             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                                 <dt className="text-sm font-medium leading-6 text-gray-900">Address</dt>
@@ -168,6 +177,7 @@ function ViewBooking() {
                     </div>
                 </div >
             </div >
+            <ArtistFooter />
         </>
     )
 }

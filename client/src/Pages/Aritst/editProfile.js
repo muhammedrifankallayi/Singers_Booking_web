@@ -19,7 +19,6 @@ function AritistEditProfile() {
         message: '',
         status: ''
     })
-    console.log('useState', profile)
     const [formData, setFormData] = useState({
         firstName: profile?.firstName,
         lastName: profile?.lastName,
@@ -49,7 +48,6 @@ function AritistEditProfile() {
     const handelSubmit = async (event) => {
         try {
             event.preventDefault()
-            console.log(formData)
             if (formData.firstName.trim().length === 0) {
                 setValidation({ message: 'Space not allowed', status: 'firstName' })
             } else if (formData.lastName.trim().length === 0) {
@@ -59,7 +57,6 @@ function AritistEditProfile() {
             } else if (formData.amount.trim().length === 0) {
                 setValidation({ message: 'Space not allowed', status: 'amount' })
             } else if (formData.discription.trim().length === 0) {
-                console.log('discriptionsssssssss');
                 setValidation({ message: 'Space not allowed', status: 'dis' })
             } else {
                 const formDataToSend = new FormData();
@@ -85,13 +82,12 @@ function AritistEditProfile() {
                     }
                 }).catch((err) => {
                     dispatch(hideLoading())
-                    localStorage.removeItem('adminKey')
+                    localStorage.removeItem('artistKey')
                     navigate('/artist/login')
                     toast('please login')
                 })
             }
         } catch (error) {
-            console.log(error)
             toast.error('somthing went wrong')
         }
     }
@@ -111,14 +107,14 @@ function AritistEditProfile() {
             }
         }).catch((err) => {
             dispatch(hideLoading())
-            localStorage.removeItem('adminKey')
+            toast.error('please login after try again')
+            localStorage.removeItem('artistKey')
             navigate('/artist/login')
         })
     }
     useEffect(() => {
         getData()
     }, [])
-    console.log('category:', category)
     return (
         <>
             <ArtistHeader />

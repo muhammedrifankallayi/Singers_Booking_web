@@ -13,39 +13,10 @@ import GusetHeader from '../../publicAndProtect/gusetHeader'
 function SignUp() {
     const dispatch = useDispatch()
     const navigate = useNavigate()
-    // const onFinish = async (value) => {
-    //     try {
-    //         dispatch(showLoading())
-    //         const response = await axios.post('/api/user/signup', value)
-    //         dispatch(hideLoading())
-    //         console.log(response.data.message)
-    //         if (response.data.success === 'otp') {
-    //             toast.success('Please Enter the opt')
-    //             setOtp(true)
-    //             return
-    //         } else if (response.data.success === true) {
-    //             toast.success('SignUp successfull')
-    //             toast('readirecting to login page')
-    //             navigate('/login')
-    //         }
-    //         else if (response.data.success === false) {
-    //             toast.error(response.data.message)
-    //         } else if (response.data.success === 'space') {
-    //             toast.error(response.data.message)
-    //         } else if (response.data.success === 'mobile') {
-    //             toast.error(response.data.message)
-    //         } else if (response.data.success === 'inccorect') {
-    //             toast.error(response.data.message)
-    //         }
-    //     } catch (error) {
-    //         dispatch(hideLoading())
-    //         toast.error('something wents worong')
-    //     }
-    // }
     const onFinish = async (value) => {
         try {
             dispatch(showLoading())
-            const response = await axios.post('/api/user/signup', value)
+            const response = await axios.post('https://spot-light.website/api/user/signup', value)
             dispatch(hideLoading())
             if (response.data.success) {
                 toast.success(response.data.message)
@@ -54,6 +25,7 @@ function SignUp() {
                 toast(response.data.message)
             }
         } catch (error) {
+            dispatch(hideLoading())
             toast('somthing went worng')
         }
     }

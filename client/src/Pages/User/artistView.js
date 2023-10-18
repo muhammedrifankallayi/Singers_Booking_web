@@ -3,12 +3,12 @@ import { useDispatch, useSelector } from 'react-redux'
 import UserHeader from '../../componants/user/userHeader'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Footer from '../../componants/user/footer'
-import ArtistPosts from '../../componants/user/artistPosts'
 import { formatDistanceToNow } from 'date-fns';
 import { FaStar } from 'react-icons/fa'
 import { setSingleArtist } from '../../Redux/singleArtistSlice'
 import { toast } from 'react-hot-toast'
 import { userRequest } from '../../axios'
+import { hideLoading, showLoading } from '../../Redux/alertSlice'
 
 function ArtistView() {
     const location = useLocation()
@@ -28,19 +28,22 @@ function ArtistView() {
         setVisibleReviews(initialReviewsToShow)
     }
     const bookingArtistView = async (id) => {
+        dispatch(showLoading())
         try {
             userRequest({
                 url: '/api/user/artist-view',
                 method: 'post',
                 data: { artistId: id }
             }).then((response) => {
+                dispatch(hideLoading())
                 if (response.data.success) {
                     dispatch(setSingleArtist(response.data.data))
                     navigate('/book-artist')
                 } else {
-
+                    dispatch(hideLoading())
                 }
             }).catch((error) => {
+                dispatch(hideLoading())
                 toast.error('somthing went wrong')
                 localStorage.removeItem('token')
                 navigate('/login')
@@ -68,10 +71,7 @@ function ArtistView() {
                                 className="mt-4 text-2xl font-semibold text-indigo-700 booking_rate" > {`Booking rate: ${data?.midBudjet}`}</h1>
                         </div>
                     </section >
-                    <div className="mt-6" >
-                        <h2 className="text-2xl font-semibold mb-2">Posts</h2>
-                        <ArtistPosts artist_id={data?.artist_id} />
-                    </div >
+
                     {rating && < div className="mt-6" >
                         <div className='ratings_Heading_div'>
                             <h2 className="text-2xl font-semibold mb-2">Ratings</h2>

@@ -3,12 +3,18 @@ import Adminlayout from '../../componants/admin/Adminlayout'
 import axios from 'axios'
 import { toast } from 'react-hot-toast';
 import AdminFooter from '../../componants/admin/adminFooter';
+import { adminRequest } from '../../axios';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { hideLoading, showLoading } from '../../Redux/alertSlice';
 
 function AddCategory() {
     const [formData, setFormData] = useState({
         name: ''
     })
     const [validation, setValidation] = useState('')
+    const navigate = useNavigate()
+    const dispatch = useDispatch()
 
     const handelInputChange = (event) => {
         const { name, value } = event.target;
@@ -19,29 +25,39 @@ function AddCategory() {
     };
 
     const handelSubmit = async (event) => {
-        try {
-            event.preventDefault()
-            var capitalizedValue = formData.name.charAt(0).toUpperCase() + formData.name.slice(1);
-            formData.name = capitalizedValue;
-            if (formData.name.trim().length === 0) {
-                setValidation('Space not allowed')
-            } else {
-                const response = await axios.post('/api/admin/addcategory', formData)
+        event.preventDefault()
+        var capitalizedValue = formData.name.charAt(0).toUpperCase() + formData.name.slice(1);
+        formData.name = capitalizedValue;
+        if (formData.name.trim().length === 0) {
+            setValidation('Space not allowed')
+        } else {
+            dispatch(showLoading())
+            adminRequest({
+                url: '/api/admin/addcategory',
+                method: 'post',
+                data: formData
+            }).then((response) => {
+                dispatch(hideLoading())
                 if (response.data.success) {
                     toast.success(response.data.message)
+                    navigate('/admin/category')
                 } else {
                     toast.error(response.data.message)
                 }
-            }
-        } catch (error) {
-            toast.error('somthing went wrong')
+            }).catch((error) => {
+                dispatch(hideLoading())
+                toast.error('please login after try again')
+                localStorage.removeItem('adminKey')
+                navigate('/admin/login')
+            })
+
         }
     }
 
     return (
         <>
             <Adminlayout />
-            <div className="p-11 sm:ml-64 mt-11 category_div">
+            <div className="p-11 sm:ml-64 mt-11 ">
                 <h1 className="mb-9 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white category_heading">Add New Category</h1>
                 <form onSubmit={handelSubmit}>
                     <div class="mb-6">

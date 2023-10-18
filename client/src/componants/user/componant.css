@@ -20,4 +20,35 @@
     cursor: pointer;
 }
 
+.user_header_logoHeading {
+    color: white;
+    font-weight: bold;
+}
+
+.booking_heading_span {
+    color: red;
+}
+
+.ri-disc-line {
+    color: red;
+    font-size: 30px;
+    padding-right: 5PX;
+}
+
+@media (max-width: 642px) {
+    .spotLight_logo {
+        margin-left: 50px;
+        /* Decrease the max-width for smaller screens */
+    }
+
+
+}
+
+@media (max-width: 500px) {
+    .user_header_logoHeading {
+        font-size: 10px;
+
+    }
+}
+
 /* .edited */

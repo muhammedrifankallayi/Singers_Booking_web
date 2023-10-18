@@ -15,11 +15,10 @@ function LogIn() {
     const onFinish = async (value) => {
         try {
             dispatch(showLoading())
-            const response = await axios.post('/api/user/login', value)
+            const response = await axios.post('https://spot-light.website/api/user/login', value)
             dispatch(hideLoading())
             if (response.data.success) {
                 toast.success(response.data.message)
-                toast('readirecting to home page')
                 localStorage.setItem('token', response.data.data);
                 navigate('/')
             } else {
@@ -27,6 +26,7 @@ function LogIn() {
                 toast.error(response.data.message)
             }
         } catch (error) {
+            dispatch(hideLoading())
             toast.error('somthing went wrong')
         }
     }

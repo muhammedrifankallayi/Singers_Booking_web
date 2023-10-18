@@ -10,18 +10,11 @@ import Footer from '../../componants/user/footer';
 
 function BookArist() {
     const dispatch = useDispatch()
-    // Edited
-    var newSocket = io('http://localhost:5000');
+    var newSocket = io('https://spot-light.website/');
     useEffect(() => {
 
-        // newSocket.on('chat message', (message) => {
-        //     console.log('Received message:', message);
-        // });
-        // return () => {
-        //     newSocket.disconnect();
-        // };
     }, []);
-    // Edited
+
 
     const navigator = useNavigate()
     const singleArtist = useSelector((state) => state.singleArtist.singleArtist)
@@ -97,7 +90,8 @@ function BookArist() {
                 dispatch(hideLoading())
                 if (response.data.success) {
                     toast.success(response.data.message)
-                    newSocket.emit('chat message', response.data.count)
+                    newSocket.emit('notifications', { count: response.data.count, room: singleArtist?.artist_id })
+                    navigator('/bookings')
                 } else {
                     toast(response.data.message)
                 }
@@ -109,9 +103,9 @@ function BookArist() {
             })
         }
     };
-    // date validation
 
     var date = new Date();
+    date.setDate(date.getDate() + 3);
     var tdate = date.getDate();
     var month = date.getMonth() + 1
     if (tdate < 10) {
@@ -161,7 +155,6 @@ function BookArist() {
                                     value={singleArtist?.firstName + ' ' + singleArtist?.lastName}
                                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                     name='artist'
-                                // onChange={handleInputChange}
                                 />
                             </div>
 
@@ -228,7 +221,6 @@ function BookArist() {
                                     value={singleArtist?.midBudjet}
                                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                     placeholder="123-45-678"
-                                    // onChange={handleInputChange}
                                     onClick={() => setValidation({ status: false })}
                                 />
                                 {validation.status === 'amount' && <p className="text-red-500">{validation.message} </p >}
@@ -257,7 +249,6 @@ function BookArist() {
                                 onChange={handleInputChange}
                                 placeholder="•••••••••"
                                 required />
-                            {/* {validation.status === 'lastName' && <p className="text-red-500">{validation.message} </p >} */}
                         </div>
                         <div className="flex items-start mb-6">
                             <div className="flex items-center h-5">

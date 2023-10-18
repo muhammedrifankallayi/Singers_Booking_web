@@ -8,8 +8,10 @@ import { hideLoading, showLoading } from '../../Redux/alertSlice'
 import Swal from 'sweetalert2';
 import id from 'date-fns/locale/id'
 import { useNavigate } from 'react-router-dom'
+import io from 'socket.io-client'
 
 function UserBookings() {
+    var newSocket = io('https://spot-light.website/');
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const [value, setValue] = useState([])
@@ -17,6 +19,7 @@ function UserBookings() {
     const [change, setChange] = useState('')
     const [bookingData, setBookingData] = useState([])
     const [artistMore, setArtistMore] = useState()
+    const [showMore, setShowMore] = useState(2);
     const getData = () => {
         dispatch(showLoading())
         userRequest({
@@ -31,7 +34,6 @@ function UserBookings() {
             } else
                 toast('no booking available')
         }).catch((err) => {
-            console.log(err)
             dispatch(hideLoading())
             toast.error('please login after try again')
             localStorage.removeItem('token')
@@ -62,21 +64,26 @@ function UserBookings() {
             confirmButtonText: 'Yes, Cancel it!'
         }).then(async (result) => {
             if (result.isConfirmed) {
+                dispatch(showLoading())
                 userRequest({
                     url: '/api/user/cancel-booking',
                     method: 'patch',
                     data: { booking_id: booking_id }
                 }).then((response) => {
+                    dispatch(hideLoading())
                     if (response.data.success) {
                         toast(response.data.msg)
                         toast.success(response.data.message)
                         setChange(response.data.msg)
+                        newSocket.emit('notifications', { count: response.data.count, room: response.data.room })
                     } else {
                         toast(response.data.msg)
                         toast.success(response.data.message)
                         setChange(response.data.msg)
+                        newSocket.emit('notifications', { count: response.data.count, room: response.data.room })
                     }
                 }).catch((error) => {
+                    dispatch(hideLoading())
                     toast('please login after try again')
                     localStorage.removeItem('token')
                     navigate('/login')
@@ -87,11 +94,24 @@ function UserBookings() {
     const chatArtist = (id) => {
         navigate('/personal-chating', { state: id })
     }
-    const filtering = (values) => {
-        const val = value.filter((items) => {
-            return values === '' ? items : items.orders.status === values || items.orders.status === 'Finsh'
-        })
-        setBookingData(val)
+    const filtering = (values, secVal) => {
+        if (secVal === 'Completed') {
+            const val = value.filter((items) => {
+                return values === '' ? items : items.orders.status === values || items.orders.status === 'Finsh' || items.orders.status === 'Completed'
+            })
+            setBookingData(val)
+        } else {
+            const val = value.filter((items) => {
+                return values === '' ? items : items.orders.status === values || items.orders.status === 'Finsh'
+            })
+            setBookingData(val)
+        }
+    }
+    function handleShowMore() {
+        setShowMore(showMore + 2);
+    }
+    function hideall() {
+        setShowMore(2)
     }
 
     return (
@@ -102,12 +122,13 @@ function UserBookings() {
                     <div className="flex items-center justify-between pb-4 bg-white dark:bg-gray-900">
                         <div>
                             <div class="dropdown">
-                                <button class="dropbtn">Filter</button>
+                                <button class="dropbtns">Filter</button>
                                 <div class="dropdown-content">
                                     <a onClick={() => filtering('')}>All</a>
                                     <a onClick={() => filtering('Booked')}>Booked</a>
-                                    <a onClick={() => filtering('Complete')}>Complete</a>
+                                    <a onClick={() => filtering('Complete', 'Completed')}>Complete</a>
                                     <a onClick={() => filtering('Cancel')}>Cancel</a>
+                                    <a onClick={() => filtering('waiting fullPayment')}>payment balance</a>
                                 </div>
                             </div>
                         </div>
@@ -164,7 +185,7 @@ function UserBookings() {
                         <tbody>
                             {bookingData?.filter((bookings) => {
                                 return search && search.toLowerCase() === "" ? bookings : bookings?.orders?.artist.toLowerCase().includes(search.toLowerCase())
-                            })?.map((element, index) => {
+                            })?.slice(0, showMore).map((element, index) => {
                                 return < tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600" >
                                     <td className="w-4 p-4 font-semibold">
                                         {index + 1}
@@ -180,9 +201,14 @@ function UserBookings() {
                                     <td className="px-6 py-4 font-semibold">
                                         {element?.orders?.fullAmount}
                                     </td>
-                                    <td className="px-6 py-4 font-semibold">
-                                        {element?.orders?.amount}
-                                    </td>
+                                    {element?.orders?.status === 'pending' || element?.orders?.status === 'Accepted' || element?.orders?.status === 'Rejected' ?
+                                        (< td className="px-6 py-4 font-semibold">
+                                            0
+                                        </td>
+                                        ) : (< td className="px-6 py-4 font-semibold">
+                                            {element?.orders?.amount}
+                                        </td>)
+                                    }
                                     <td className="px-6 py-4 font-semibold">
                                         <div className="flex items-center">
                                             {element?.orders?.category}
@@ -213,12 +239,30 @@ function UserBookings() {
                                         {element?.orders?.status === 'Booked' && <button
                                             type="button"
                                             onClick={() => chatArtist(element?.orders?.payment_id)}
-                                            class="text-white bg-red-700 hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-5 py-2.5 text-center mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">Chat</button>}
+                                            class="text-white bg-green-700 hover:bg-green-800 focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-full text-sm px-5 py-2.5 text-center mr-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-900">Chat</button>}
                                     </td>
                                 </tr>
                             })}
                         </tbody>
                     </table>
+                    {showMore > 1 && showMore !== bookingData.length && showMore < bookingData.length && < div class="max-w-md mx-auto p-4 flex justify-center">
+                        <button
+                            id="showMoreBtn"
+                            onClick={handleShowMore}
+                            class="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none">
+                            Show More
+                        </button>
+                    </div>
+                    }
+                    {showMore >= bookingData.length && bookingData.length != 2 && < div class="max-w-md mx-auto p-4 flex justify-center">
+                        <button
+                            id="showMoreBtn"
+                            onClick={hideall}
+                            class="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none">
+                            Hide
+                        </button>
+                    </div>
+                    }
                 </div >
             </div >
             <Footer />

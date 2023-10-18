@@ -4,28 +4,34 @@ import Footer from '../../componants/user/footer'
 import { userRequest } from '../../axios'
 import { toast } from 'react-hot-toast'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { loadScript } from 'https://checkout.razorpay.com/v1/checkout.js';
+// import { loadScript } from 'https://checkout.razorpay.com/v1/checkout.js';
+import { useDispatch } from 'react-redux'
+import { hideLoading, showLoading } from '../../Redux/alertSlice'
 
 function ConfirmBooking() {
     const [bookingData, setBookingData] = useState()
     const [category, setCategory] = useState()
     const location = useLocation()
     const booking_id = location.state
+    const dispatch = useDispatch()
     const navigate = useNavigate()
     const getData = () => {
+        dispatch(showLoading())
         userRequest({
             url: '/api/user/confirm_booking_data',
             method: 'post',
             data: { booking_id: booking_id }
         }).then((response) => {
+            dispatch(hideLoading())
             if (response.data.success) {
                 setBookingData(response.data.data)
                 setCategory(response.data.category)
             }
         }).catch((err) => {
+            dispatch(hideLoading())
             toast.error('please login after try again')
-            // localStorage.removeItem('token')
-            // navigate('/login')
+            localStorage.removeItem('token')
+            navigate('/login')
         })
     }
     useEffect(() => {
@@ -42,17 +48,15 @@ function ConfirmBooking() {
         const formattedDate = `${year}-${month < 10 ? '0' : ''}${month}-${day < 10 ? '0' : ''}${day}`;
         return formattedDate
     }
-
-    // Edited
-
     const advancePayment = async (req, res) => {
         const advancepayment = await advance()
-        // console.log(advancepayment)
+        dispatch(showLoading())
         userRequest({
             url: '/api/user/advance-payment',
             method: 'post',
             data: { booking_id: bookingData?.[0].orders?._id, advance: advancepayment }
         }).then((response) => {
+            dispatch(hideLoading())
             if (response.data.success) {
                 toast(response.data.message)
                 razorpayPayment(response.data.data)
@@ -60,6 +64,7 @@ function ConfirmBooking() {
                 toast.error('payment not  compleate')
             }
         }).catch((error) => {
+            dispatch(hideLoading())
             toast.error('please login after try again')
             localStorage.removeItem('token')
             navigate('/login')
@@ -98,8 +103,7 @@ function ConfirmBooking() {
         }
 
         const verifyPayment = (payment, order) => {
-            console.log('response', payment)
-            console.log('order', order)
+            dispatch(showLoading())
             userRequest(({
                 url: '/api/user/varifiy-payment',
                 method: 'post',
@@ -108,12 +112,15 @@ function ConfirmBooking() {
                     order: order
                 }
             })).then((response) => {
+                dispatch(hideLoading())
                 if (response.data.success) {
                     toast.success('success')
+                    navigate('/bookings')
                 } else {
                     toast.error('payment fail')
                 }
             }).catch((err) => {
+                dispatch(hideLoading())
                 toast.error('please login after try again')
                 localStorage.removeItem('token')
                 navigate('/login')
@@ -121,17 +128,15 @@ function ConfirmBooking() {
             })
         }
     }
-    // Edited
     function advance() {
         return bookingData?.[0].orders?.amount * 10 / 100
     }
     return (
         <>
-            {console.log('ssssssssss', bookingData)}
+
             < UserHeader />
-            {console.log('bb', bookingData?.[0].orders.firstName)}
-            < div className="flex justify-center items-center h-screen" >
-                <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+            < div className="flex justify-center items-center h-screen  confirm_booking_main_div" >
+                <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md confirm_bookings">
                     <h1 className="text-3xl font-semibold mb-6 text-center confirm_booking_heading">Your Booking </h1>
                     <div className="border-b pb-4 mb-4">
                         <span style={{ marginRight: '50px' }}>Artist</span>

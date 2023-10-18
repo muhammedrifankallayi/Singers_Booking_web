@@ -75,7 +75,7 @@ input {
     color: white;
 }
 
-/* notification_ artist */
+
 .notificationH1_div {
     margin-top: 2%;
     margin-left: 10%;
@@ -102,9 +102,7 @@ input {
     margin-top: 1%
 }
 
-/* .notification_image_div {
-    width: 56px;
-} */
+
 .booking_infoArtist {
     padding: 4% 15% 0% 15%;
 
@@ -120,7 +118,7 @@ input {
     margin-left: 50%;
 }
 
-/* artist bookings information  */
+
 .bookings_div {
     padding: 2% 6% 0% 6%;
     margin-bottom: 31%;
@@ -130,7 +128,7 @@ input {
     background-color: rgba(0, 0, 0, 0.345) !important;
 }
 
-/* .details_div {} */
+
 .bg-cover {
     background-image: url("../../../public/images/R&L.png");
 }
@@ -191,8 +189,6 @@ input {
     margin: 5px 0;
 }
 
-/* Apply responsive design using media queries */
-/* Define general styles */
 .artist-main_profile_div {
     display: flex;
     justify-content: center;
@@ -260,7 +256,7 @@ input {
     margin-left: 10%;
 }
 
-/* Apply responsive design using media queries */
+
 @media screen and (max-width: 768px) {
     .personal_information_div {
         width: 90%;
@@ -292,6 +288,36 @@ input {
     margin-left: 82%;
 }
 
-/* .artist_home_carosel_div {
-    padding: 0% 0% 0% 0%;
-} */
+.chats-contact {
+    width: 50%;
+    padding: 0% 8% 1% 8%;
+    margin-left: 23%;
+    border-radius: 5px;
+    margin-right: 23%;
+}
+
+.main_chats_div {
+    background-image: url('../../../public/images/pexels-kindel-media-7149165.jpg');
+    background-size: cover;
+    background-position: center;
+}
+
+@media (min-width:550px) {
+    .sample1 {
+        display: flex;
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 550px) {
+    .sample {
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .sample3 {
+        display: flex;
+        justify-content: center;
+    }
+}

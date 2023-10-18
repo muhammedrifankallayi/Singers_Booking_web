@@ -1,28 +1,34 @@
 import React, { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { request, userRequest } from '../../axios'
+import { useNavigate } from 'react-router-dom'
+import { userRequest } from '../../axios'
 import { toast } from 'react-hot-toast'
 import UserHeader from '../../componants/user/userHeader'
 import Footer from '../../componants/user/footer'
 import { formatDistanceToNow } from 'date-fns';
 import Swal from 'sweetalert2';
 import id from 'date-fns/locale/id'
+import { useDispatch } from 'react-redux'
+import { hideLoading, showLoading } from '../../Redux/alertSlice'
 
 
 function UserNotification() {
     const navigate = useNavigate()
+    const dispatch = useDispatch()
     const [notificaions, setNotificaions] = useState()
     const getData = () => {
+        dispatch(showLoading())
         userRequest({
             url: '/api/user/notifications',
             method: 'post',
         }).then((response) => {
+            dispatch(hideLoading())
             if (response.data.success) {
                 setNotificaions(response.data.data)
             } else {
                 toast('No notificaions')
             }
         }).catch((err) => {
+            dispatch(hideLoading())
             toast.error('please login after try again')
             localStorage.removeItem('token')
             navigate('/login')
@@ -36,13 +42,13 @@ function UserNotification() {
     }
 
     const cancelDetails = (booking_id) => {
-        console.log('book id', booking_id)
-
+        dispatch(showLoading())
         userRequest({
             url: '/api/user/cancel-swal',
             method: 'post',
             data: { booking_id: booking_id }
         }).then((response) => {
+            dispatch(hideLoading())
             if (response.data.success) {
                 Swal.fire({
                     title: 'Cancel!',
@@ -56,8 +62,10 @@ function UserNotification() {
                 toast.error(response.data.message)
             }
         }).catch((err) => {
-            console.log(err)
+            dispatch(hideLoading())
             toast.error('please login after try agains')
+            localStorage.removeItem('token')
+            navigate('/login')
         })
     }
 
@@ -65,7 +73,6 @@ function UserNotification() {
         navigate('/fullpayment', { state: Data })
     }
     const reviewWrite = (id) => {
-        console.log(id)
         navigate('/rating', { state: id })
     }
     return (

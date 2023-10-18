@@ -40,7 +40,6 @@ import Bookings from './Pages/Aritst/bookings';
 import ArtistAdminView from './Pages/Admin/artistView';
 import UserProfile from './Pages/User/userProfile';
 import EditProfile from './Pages/User/editProfile';
-// import ArtistProfile from './Pages/Aritst/artistProfile';
 import AritistEditProfile from './Pages/Aritst/editProfile';
 import UserNotification from './Pages/User/userNotification';
 import ConfirmBooking from './Pages/User/confirmBooking';
@@ -48,7 +47,6 @@ import UserBookings from './Pages/User/bookings';
 import ViewCancel from './Pages/Aritst/viewCancel';
 import PersonalChating from './Pages/User/personalChating';
 import AritstPersongalChating from './Pages/Aritst/personalChatting'
-import PostUpload from './Pages/Aritst/postUpload';
 import FullPayment from './Pages/User/fullPayment';
 import AdminBookings from './Pages/Admin/bookings';
 import BookingsView from './Pages/Admin/bookingsView';
@@ -56,6 +54,9 @@ import Rating from './Pages/User/rating';
 import Profile from './Pages/Aritst/profile';
 import GuestPage from './componants/gustPage';
 import ComonPublicRoute from './publicAndProtect/comonPublicRoute';
+import ArtistDashBoard from './Pages/Aritst/artistDashBoard';
+import Chats from './Pages/Aritst/chats';
+import UserChats from './Pages/User/chats';
 
 
 function App() {
@@ -86,6 +87,8 @@ function App() {
         <Route path='/personal-chating' element={<ProtectedRoute><  PersonalChating /></ProtectedRoute>} />
         <Route path='/fullpayment' element={<ProtectedRoute>< FullPayment /></ProtectedRoute>} />
         <Route path='/rating' element={<ProtectedRoute>< Rating /></ProtectedRoute>} />
+        <Route path='/chat-history' element={<ProtectedRoute>< UserChats /></ProtectedRoute>} />
+
         {/* Artist Side */}
         <Route path='/artist/login' element={<AritstPublicRoute>< ArtistLogin /></AritstPublicRoute>} />
         <Route path='/artist/signUp' element={<AritstPublicRoute><ArtistSignup /></AritstPublicRoute>} />
@@ -93,16 +96,16 @@ function App() {
         <Route path='/artist/setpassword' element={<AristsetPassword />} />
         <Route path='/artist/otvalidation' element={<OtpValidationForm />} />
         <Route path='/artist' element={<ArtistProtectedRoute>< ArtistHome /></ArtistProtectedRoute >} />
-        {/* <Route path='/artist/profile' element={<ArtistProtectedRoute>< ArtistProfile /></ArtistProtectedRoute >} /> */}
         <Route path='/artist/edit-profile' element={<ArtistProtectedRoute>< AritistEditProfile /></ArtistProtectedRoute >} />
         <Route path='/artist/artistdetailsform' element={<ArtistProtectedRoute><ArtistDetailsForm /></ArtistProtectedRoute >} />
         <Route path='/artist/notification' element={<ArtistProtectedRoute><Notification /></ArtistProtectedRoute >} />
         <Route path='/artist/viewbooking' element={<ArtistProtectedRoute><  ViewBooking /></ArtistProtectedRoute >} />
         <Route path='/artist/view-cancel' element={<ArtistProtectedRoute><  ViewCancel /></ArtistProtectedRoute >} />
         <Route path='/artist/bookings' element={<ArtistProtectedRoute><  Bookings /></ArtistProtectedRoute >} />
-        <Route path='/artist/upload-post' element={<ArtistProtectedRoute>< PostUpload /></ArtistProtectedRoute >} />
         <Route path='/artist/personal-chating' element={<ArtistProtectedRoute>< AritstPersongalChating /></ArtistProtectedRoute >} />
         <Route path='/artist/profile' element={<ArtistProtectedRoute>< Profile /></ArtistProtectedRoute>} />
+        <Route path='/artist/dash-bord' element={<ArtistProtectedRoute><  ArtistDashBoard /></ArtistProtectedRoute>} />
+        <Route path='/artist/chat-history' element={<ArtistProtectedRoute><  Chats /></ArtistProtectedRoute>} />
         {/* Admin Side */}
         <Route path='/admin/login' element={<AdminPublicroute>< Adminlogin /></AdminPublicroute >} />
         <Route path='/admin/forgotpassword' element={<ForgotPasswordAdmin />} />

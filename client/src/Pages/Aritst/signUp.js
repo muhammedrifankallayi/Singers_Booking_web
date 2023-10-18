@@ -38,10 +38,9 @@ function ArtistSignup() {
                 toast.error('otp has inccorect please check')
             } else {
                 dispatch(showLoading())
-                const response = await axios.post('/api/artist/signup', formData);
+                const response = await axios.post('https://spot-light.website/api/artist/signup', formData);
                 dispatch(hideLoading())
                 if (response.data.success === true) {
-                    console.log(response.data)
                     toast('please Enter Otp')
                     setMessage({
                         success: true, message: response.data.message, responseOtp: response.data.otp
@@ -88,8 +87,6 @@ function ArtistSignup() {
                                     type="text"
                                     placeholder='Enter First Name'
                                     onClick={() => setMessage(false)}
-                                    // autoComplete="email"
-                                    // value={formData.firstName}
                                     onChange={handleInputChange}
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                 />
@@ -107,8 +104,6 @@ function ArtistSignup() {
                                     type="text"
                                     placeholder='Enter Last Name'
                                     onClick={() => setMessage(false)}
-                                    // autoComplete="email"
-                                    // value={formData.lastName}
                                     onChange={handleInputChange}
                                     required
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -127,8 +122,6 @@ function ArtistSignup() {
                                     type="number"
                                     placeholder='Enter Mobile'
                                     onClick={() => setMessage(false)}
-                                    // autoComplete="email"
-                                    // value={formData.mobile}
                                     onChange={handleInputChange}
                                     required
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -148,7 +141,6 @@ function ArtistSignup() {
                                     placeholder='Enter Email'
                                     autoComplete="email"
                                     onClick={() => setMessage(false)}
-                                    // value={formData.email}
                                     onChange={handleInputChange}
                                     required
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -161,11 +153,6 @@ function ArtistSignup() {
                                 <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
                                     Password
                                 </label>
-                                {/* <div className="text-sm">
-                                    <Link className="font-semibold text-indigo-600 hover:text-indigo-500 ">
-                                        Forgot password?
-                                    </Link>
-                                </div> */}
                             </div>
                             <div className="mt-1">
                                 <input
@@ -175,7 +162,6 @@ function ArtistSignup() {
                                     placeholder='Enter Password'
                                     autoComplete="current-password"
                                     onClick={() => setMessage(false)}
-                                    // value={formData.password}
                                     onChange={handleInputChange}
                                     required
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -194,14 +180,11 @@ function ArtistSignup() {
                                         name="otp"
                                         type="text"
                                         autoComplete="email"
-                                        // onClick={() => setMessage(false)}
-                                        // value={formData.email}
                                         onChange={handleInputChange}
                                         placeholder='Enter OTP'
                                         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                     />
                                 </div>
-                                {/* {message.success === 'Exist' && <p className='text'>{message.message}</p>} */}
                             </div>
                         }
 
