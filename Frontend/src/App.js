@@ -18,8 +18,10 @@ import ArtistLogin from './Pages/Aritst/logIn';
 import ArtistSignup from './Pages/Aritst/signUp';
 import AristsetPassword from './Pages/Aritst/setPassword'
 import OtpValidationForm from './Pages/Aritst/otpvalidation';
+
 import ArtistHome from './Pages/Aritst/home';
 import ArtistforgotPassword from './Pages/Aritst/forgotPassword';
+
 import Adminlogin from './Pages/Admin/logIn';
 import AdminHome from './Pages/Admin/home';
 import ForgotPasswordAdmin from './Pages/Admin/forgotPassword';
